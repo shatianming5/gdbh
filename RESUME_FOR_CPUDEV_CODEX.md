@@ -25,6 +25,7 @@ Generated from local workspace `/Users/tommy/Downloads/gdbh`.
 10. `Gdbh/PathC_ResidueRemainderWitnessDivisorPartition.lean`
 11. `Gdbh/PathC_ResidueRemainderWitnessCover.lean`
 12. `Gdbh/PathC_ResidueRemainderWitnessCoverRearrange.lean`
+13. `Gdbh/PathC_ResidueRemainderWitnessCoverFiltered.lean`
 
 ## Active Goal
 
@@ -67,7 +68,7 @@ Use targeted `#print axioms` probes for individual theorems. Do not run
 
 ## Current Verified State
 
-Latest verified mathematical round in the scoreboard is Round 81.
+Latest verified mathematical round in the scoreboard is Round 82.
 
 Round 75 added the coprime/non-coprime compatible-remainder split:
 
@@ -305,6 +306,73 @@ lines, 7,436 theorem/lemma declarations, 3,089 definitions, zero genuine `sorry`
 `admit`, zero axiom declarations, and both headline theorems exactly
 `[propext, Classical.choice, Quot.sound]`.
 
+Round 82 added the filtered-support prime-first cover:
+
+- `Gdbh/PathC_ResidueRemainderWitnessCoverFiltered.lean`
+- import in `Gdbh.lean`
+- active worker:
+
+```text
+ResidueCompatibleRemainderFilteredCoverSplitLogSquaredUpperEventually
+  = ResidueCoprimeCompatibleRemainderLogSquaredUpperEventually
+    and ResidueSharedPrimeWitnessFilteredCoverLogSquaredUpperEventually
+  => ResidueCompatibleRemainderPrimeFirstCoverSplitLogSquaredUpperEventually
+  => ResidueCompatibleRemainderWitnessCoverSplitLogSquaredUpperEventually
+  => ResidueCompatibleRemainderDivisorWitnessSplitLogSquaredUpperEventually
+  => ...
+  => Path C K-Goldbach
+```
+
+The filtered family is:
+
+```text
+residueWitnessContainingDivisorFamily z k p =
+  ((residuePrimeSet z).powerset.filter (fun d => d.card <= k)).filter
+    (fun d => p in d)
+```
+
+The cover equality is:
+
+```text
+residueDoubleDivisorSharedPrimeDivisorWitnessPrimeFirstCoverSum n z k
+  =
+residueDoubleDivisorSharedPrimeDivisorWitnessFilteredCoverSum n z k
+```
+
+The filtered form remains an overlapping witness-prime cover:
+
+```text
+sum p in residuePrimeDivisorWitnessSet n z,
+  sum d1 in residueWitnessContainingDivisorFamily z k p,
+    sum d2 in residueWitnessContainingDivisorFamily z k p,
+      |mu d1 * mu d2| * |pairRemainder n d1 d2|
+```
+
+Key bridges:
+
+```text
+residueDoubleDivisorSharedPrimeDivisorWitnessPrimeFirstCoverSum_eq_filtered
+residueDoubleDivisorSharedPrimeDivisorWitnessPrimeFirstCoverSumAtSqrt_eq_filtered
+residueSharedPrimeWitnessPrimeFirstCoverLogSquaredUpperAfter_of_filtered
+residueSharedPrimeWitnessPrimeFirstCoverLogSquaredUpperEventually_of_filtered
+residueCompatibleRemainderPrimeFirstCoverSplitLogSquaredUpperEventually_of_filteredSplit
+pathC_kGoldbach_of_compatibleRemainderFilteredCoverSplit_and_countingInput
+```
+
+Round 82 verification passed:
+
+- `lake env lean Gdbh/PathC_ResidueRemainderWitnessCoverFiltered.lean`
+- `lake build`
+- `python3 audit_lean_source.py`
+- `bash scripts/audit_full.sh`
+- `python3 scripts/regenerate_agents_md.py`
+
+The source audit scanned 280 Lean files with no banned project assumptions or
+placeholders.  The full audit reported 279 Lean files under `Gdbh/`, 236,659
+lines, 7,442 theorem/lemma declarations, 3,095 definitions, zero genuine `sorry`
+or `admit`, zero axiom declarations, and both headline theorems exactly
+`[propext, Classical.choice, Quot.sound]`.
+
 ## Most Recent Non-Math Work
 
 The repository was initialized locally, pushed to GitHub, and then updated
@@ -318,50 +386,47 @@ with a compatibility copy:
 `Agent.md` should remain a compatibility copy of `AGENTS.md` after each
 regeneration.
 
-No Lean mathematical change has been made after Round 81.
-
 ## Suggested Next Round
 
-Continue with Round 82.
+Continue with Round 83.
 
 Primary candidate:
 
 ```text
-Candidate: prime-first filtered-support form
-  Goal: replace the inner if p in d1 inter d2 with filters
-        d1 in F.filter (fun d => p in d), d2 in same
-  ExpectedDelta: about 36-40
-  Risk: moderate, mostly Finset.sum_filter bookkeeping
+Candidate: filtered cover cardinal/envelope bound
+  Goal: isolate the purely finite estimate controlling the filtered pair
+        families for each witness prime before analytic log-squared work
+  ExpectedDelta: about 35-40
+  Risk: moderate, mostly Finset.card/filter and nonnegative sum bounds
   Execute if Lean proof is small and additive
 ```
 
 Reason:
 
-Round81 made the prime-first cover explicit:
+Round82 made the filtered-support cover explicit:
 
 ```text
 sum p in residuePrimeDivisorWitnessSet n z,
-  sum d1 in F,
-    sum d2 in F,
-      |mu d1 * mu d2| *
-        if p in d1 inter d2 then |pairRemainder n d1 d2| else 0
+  sum d1 in residueWitnessContainingDivisorFamily z k p,
+    sum d2 in residueWitnessContainingDivisorFamily z k p,
+      |mu d1 * mu d2| * |pairRemainder n d1 d2|
 ```
 
-The next useful decomposition is to push the indicator into the finite support
-filters for `d1` and `d2`.  This remains algebraic and still counts overlaps
-honestly.
+The next useful decomposition is to separate finite combinatorial support
+size from the analytic pair-remainder bounds, still without claiming a
+disjoint witness-prime partition.
 
 Possible additive file:
 
 ```text
-Gdbh/PathC_ResidueRemainderWitnessCoverFiltered.lean
+Gdbh/PathC_ResidueRemainderWitnessCoverFilteredEnvelope.lean
 ```
 
 Possible public theorems:
 
 ```text
-residueDoubleDivisorSharedPrimeDivisorWitnessPrimeFirstCoverSum_eq_filtered
-ResidueSharedPrimeWitnessFilteredCoverLogSquaredUpperEventually
+residueWitnessContainingDivisorFamily_card_le
+residueDoubleDivisorSharedPrimeDivisorWitnessFilteredCoverSum_le_envelope
 ```
 
 Secondary candidate:
@@ -391,4 +456,4 @@ sed -n '1,140p' AGENTS.md
 tail -n 260 pathc_master_scoreboard.md
 ```
 
-Then start Round 82 with the master-controller workflow above.
+Then start Round 83 with the master-controller workflow above.

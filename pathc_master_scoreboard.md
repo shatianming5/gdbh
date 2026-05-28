@@ -6248,3 +6248,148 @@ Candidate: prime-first filtered-support form
   ExpectedDelta: about 36-40
   Risk: moderate, mostly Finset.sum_filter bookkeeping
 ```
+
+## Round 82 - filtered-support prime-first cover
+
+Controller status:
+
+Two scouts were requested for this round, but both failed before producing a
+report because the tool-layer thread limit is still occupied by existing
+agent entries:
+
+```text
+round82_sum_filter_scout     failed: collab spawn failed: agent thread limit reached
+round82_bridge_scout         failed: collab spawn failed: agent thread limit reached
+```
+
+The controller proceeded directly because the work was algebraic, additive,
+and score-positive: it only pushes the public Round81 indicator into finite
+support filters and keeps the same overlapping witness-prime cover.
+
+Score decision:
+
+```text
+Candidate: prime-first filtered-support form
+  FinalChainImpact      5
+  ResidualReduction     5
+  VerificationGain      6
+  DecompositionQuality  7
+  ReuseValue            7
+  FalsePropRisk         0
+  IntegrationRisk       4
+  ScopeDriftRisk        0
+  ExpectedDelta         39
+  Decision              execute
+
+Candidate: naive disjoint witness sum
+  FinalChainImpact      5
+  ResidualReduction     6
+  VerificationGain      1
+  DecompositionQuality  2
+  ReuseValue            1
+  FalsePropRisk         8
+  IntegrationRisk       8
+  ScopeDriftRisk        1
+  ExpectedDelta         -4
+  Decision              reject
+
+Candidate: direct analytic filtered-cover closure
+  FinalChainImpact      8
+  ResidualReduction     10
+  VerificationGain      2
+  DecompositionQuality  3
+  ReuseValue            3
+  FalsePropRisk         4
+  IntegrationRisk       8
+  ScopeDriftRisk        0
+  ExpectedDelta         34
+  Decision              defer
+```
+
+The new file `Gdbh/PathC_ResidueRemainderWitnessCoverFiltered.lean`,
+imported from `Gdbh.lean`, exposes the filtered family
+
+```text
+residueWitnessContainingDivisorFamily z k p =
+  ((residuePrimeSet z).powerset.filter (fun d => d.card <= k)).filter
+    (fun d => p in d)
+```
+
+and proves the Round81 prime-first cover equals the filtered-support form:
+
+```text
+residueDoubleDivisorSharedPrimeDivisorWitnessPrimeFirstCoverSum n z k
+  =
+residueDoubleDivisorSharedPrimeDivisorWitnessFilteredCoverSum n z k
+```
+
+The filtered form is still an overlapping cover:
+
+```text
+sum p in residuePrimeDivisorWitnessSet n z,
+  sum d1 in residueWitnessContainingDivisorFamily z k p,
+    sum d2 in residueWitnessContainingDivisorFamily z k p,
+      |mu d1 * mu d2| * |pairRemainder n d1 d2|
+```
+
+No disjointness over witness primes is asserted.
+
+Public definitions and worker Props added:
+
+```text
+residueWitnessContainingDivisorFamily
+residueDoubleDivisorSharedPrimeDivisorWitnessFilteredCoverSum
+residueDoubleDivisorSharedPrimeDivisorWitnessFilteredCoverSumAtSqrt
+ResidueSharedPrimeWitnessFilteredCoverLogSquaredUpperAfter
+ResidueSharedPrimeWitnessFilteredCoverLogSquaredUpperEventually
+ResidueCompatibleRemainderFilteredCoverSplitLogSquaredUpperEventually
+```
+
+Public bridges added:
+
+```text
+residueDoubleDivisorSharedPrimeDivisorWitnessPrimeFirstCoverSum_eq_filtered
+residueDoubleDivisorSharedPrimeDivisorWitnessPrimeFirstCoverSumAtSqrt_eq_filtered
+residueSharedPrimeWitnessPrimeFirstCoverLogSquaredUpperAfter_of_filtered
+residueSharedPrimeWitnessPrimeFirstCoverLogSquaredUpperEventually_of_filtered
+residueCompatibleRemainderPrimeFirstCoverSplitLogSquaredUpperEventually_of_filteredSplit
+pathC_kGoldbach_of_compatibleRemainderFilteredCoverSplit_and_countingInput
+```
+
+The active decomposition is now:
+
+```text
+ResidueCompatibleRemainderFilteredCoverSplitLogSquaredUpperEventually
+  = ResidueCoprimeCompatibleRemainderLogSquaredUpperEventually
+    and ResidueSharedPrimeWitnessFilteredCoverLogSquaredUpperEventually
+  => ResidueCompatibleRemainderPrimeFirstCoverSplitLogSquaredUpperEventually
+  => ResidueCompatibleRemainderWitnessCoverSplitLogSquaredUpperEventually
+  => ResidueCompatibleRemainderDivisorWitnessSplitLogSquaredUpperEventually
+  => ...
+  => Path C K-Goldbach
+```
+
+Verification for Round 82 passed:
+
+* `lake env lean Gdbh/PathC_ResidueRemainderWitnessCoverFiltered.lean`
+* `lake build`
+* `python3 audit_lean_source.py`
+* `bash scripts/audit_full.sh`
+* `python3 scripts/regenerate_agents_md.py`
+
+The single-file and full-build checks printed allowed axiom sets for the new
+public theorem dependencies.  The source audit scanned 280 Lean files with no
+banned project assumptions or placeholders.  The full audit reported 279 Lean
+files under `Gdbh/`, 236,659 lines, 7,442 theorem/lemma declarations, 3,095
+definitions, zero genuine `sorry` or `admit`, zero axiom declarations, and
+both headline theorems with exactly `[propext, Classical.choice, Quot.sound]`.
+
+Next score-positive candidate:
+
+```text
+Candidate: filtered cover cardinal/envelope bound
+  Goal: isolate the purely finite estimate controlling the filtered pair
+        families for each witness prime before any analytic log-squared work
+  ExpectedDelta: about 35-40
+  Risk: moderate, mostly Finset.card/filter and nonnegative sum bounds
+```

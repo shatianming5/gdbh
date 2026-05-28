@@ -256,6 +256,7 @@ import Gdbh.PathC_ResidueRemainderSharedPrimeWitness
 import Gdbh.PathC_ResidueRemainderWitnessDivisorPartition
 import Gdbh.PathC_ResidueRemainderWitnessCover
 import Gdbh.PathC_ResidueRemainderWitnessCoverRearrange
+import Gdbh.PathC_ResidueRemainderWitnessCoverFiltered
 import Gdbh.PathC_KEstimate
 import Gdbh.PathC_HalfDensityShape
 import Gdbh.FiniteQuotientObstruction
