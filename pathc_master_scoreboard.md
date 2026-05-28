@@ -5505,3 +5505,154 @@ Candidate: non-coprime compatible remainder intersection split
   ExpectedDelta: about 40
   Risk: low-to-moderate, mostly finite-set algebra
 ```
+
+## Round 77 - shared-prime intersection split
+
+Controller status:
+
+Round77 scout spawning was attempted but rejected by the tool-layer thread
+limit.  Attempts to close stale shutdown entries also returned thread-not-found
+errors, so the controller continued directly and recorded the condition rather
+than stalling.  No running useful agent was closed.
+
+Score decision:
+
+```text
+Candidate: non-coprime compatible remainder intersection split
+  FinalChainImpact      5
+  ResidualReduction     5
+  VerificationGain      6
+  DecompositionQuality  7
+  ReuseValue            7
+  FalsePropRisk         0
+  IntegrationRisk       3
+  ScopeDriftRisk        0
+  ExpectedDelta         41
+  Decision              execute
+
+Candidate: direct non-coprime log-squared analytic upper closure
+  FinalChainImpact      8
+  ResidualReduction     10
+  VerificationGain      2
+  DecompositionQuality  3
+  ReuseValue            2
+  FalsePropRisk         4
+  IntegrationRisk       8
+  ScopeDriftRisk        0
+  ExpectedDelta         33
+  Decision              defer
+
+Candidate: coprime CRT discrepancy normalization first
+  FinalChainImpact      5
+  ResidualReduction     4
+  VerificationGain      4
+  DecompositionQuality  6
+  ReuseValue            5
+  FalsePropRisk         0
+  IntegrationRisk       5
+  ScopeDriftRisk        0
+  ExpectedDelta         35
+  Decision              defer until shared-prime branch is explicit
+
+Candidate: scoreboard-only note
+  FinalChainImpact      1
+  ResidualReduction     0
+  VerificationGain      2
+  DecompositionQuality  4
+  ReuseValue            2
+  FalsePropRisk         0
+  IntegrationRisk       0
+  ScopeDriftRisk        1
+  ExpectedDelta         18
+  Decision              defer
+```
+
+The new file `Gdbh/PathC_ResidueRemainderIntersectionSplit.lean`, imported
+from `Gdbh.lean`, rewrites the Round75 non-coprime compatible remainder in
+intersection language.  This is the intended use of the Round76 product-support
+facts.
+
+Public definitions and worker Props added:
+
+```text
+residueSharedPrimeIntersectionPairCountingRemainder
+residueDoubleDivisorSharedPrimeIntersectionRemainderSum
+residueDoubleDivisorSharedPrimeIntersectionRemainderSumAtSqrt
+ResidueSharedPrimeIntersectionRemainderLogSquaredUpperAfter
+ResidueSharedPrimeIntersectionRemainderLogSquaredUpperEventually
+ResidueCompatibleRemainderIntersectionSplitLogSquaredUpperEventually
+```
+
+Public bridges added:
+
+```text
+residueNonCoprimeCompatiblePairCountingRemainder_eq_sharedPrimeIntersection
+residueSharedPrimeIntersectionPairCountingRemainder_eq_zero_of_inter_empty
+residueSharedPrimeIntersectionPairCountingRemainder_eq_of_inter_dvd
+residueDoubleDivisorNonCoprimeCompatibleRemainderSum_eq_sharedPrimeIntersection
+residueDoubleDivisorNonCoprimeCompatibleRemainderSumAtSqrt_eq_sharedPrimeIntersection
+residueNonCoprimeCompatibleRemainderLogSquaredUpperAfter_of_sharedPrimeIntersection
+residueNonCoprimeCompatibleRemainderLogSquaredUpperEventually_of_sharedPrimeIntersection
+residueCompatibleRemainderCoprimeSplitLogSquaredUpperEventually_of_intersectionSplit
+pathC_kGoldbach_of_compatibleRemainderIntersectionSplit_and_countingInput
+```
+
+The new active decomposition is:
+
+```text
+ResidueCompatibleRemainderIntersectionSplitLogSquaredUpperEventually
+  = ResidueCoprimeCompatibleRemainderLogSquaredUpperEventually
+    and ResidueSharedPrimeIntersectionRemainderLogSquaredUpperEventually
+  => ResidueCompatibleRemainderCoprimeSplitLogSquaredUpperEventually
+  => ResidueCompatibleRemainderLogSquaredUpperEventually
+  => ResidueRemainderLogSquaredUpperEventually
+  => ...
+  => Path C K-Goldbach
+```
+
+The shared-prime pair branch is exactly:
+
+```text
+if d1 inter d2 = empty then 0
+else if (d1 inter d2).prod id divides n then
+  residuePairCountingRemainder n d1 d2
+else 0
+```
+
+For residue-prime subsets, this is definitionally connected to the Round75
+non-coprime compatible pair branch using:
+
+```text
+Nat.Coprime (d1.prod id) (d2.prod id) <-> d1 inter d2 = empty
+Nat.gcd (d1.prod id) (d2.prod id) divides n
+  <-> (d1 inter d2).prod id divides n
+```
+
+This is score-positive because it makes the shared-prime obstruction explicit
+without asserting any new cancellation, asymptotic estimate, or
+primorial-sensitive inequality.
+
+Verification for Round 77 passed:
+
+* `lake env lean Gdbh/PathC_ResidueRemainderIntersectionSplit.lean`
+* `lake build`
+* `python3 audit_lean_source.py`
+* `bash scripts/audit_full.sh`
+* `python3 scripts/regenerate_agents_md.py`
+
+The single-file and full-build checks printed allowed axiom sets for the new
+public theorem dependencies.  The source audit scanned 275 Lean files with no
+banned project assumptions or placeholders.  The full audit reported 274 Lean
+files under `Gdbh/`, 235,380 lines, 7,401 theorem/lemma declarations, 3,065
+definitions, zero genuine `sorry` or `admit`, zero axiom declarations, and
+both headline theorems with exactly `[propext, Classical.choice, Quot.sound]`.
+
+Next score-positive candidate:
+
+```text
+Candidate: shared-prime intersection support by witness prime
+  Goal: split the shared-prime branch by a witness p in d1 inter d2 and
+        expose the p | n consequence from (d1 inter d2).prod id | n
+  ExpectedDelta: about 38-42
+  Risk: low-to-moderate, finite-set coverage/overlap bookkeeping
+```
