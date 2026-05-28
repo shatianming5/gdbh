@@ -7040,3 +7040,124 @@ Candidate: termwise shared-prime remainder envelope
   Risk: moderate; must avoid turning the trivial `2n` pointwise bound into
         a false log-squared tail claim
 ```
+
+## Round 88 - termwise shared-prime remainder split
+
+Controller status:
+
+The controller attempted a focused no-edit scout for the Round88 termwise
+split.  The runtime still has stale shutdown agent entries occupying the
+thread accounting, so the spawn failed:
+
+```text
+termwise_remainder_scout failed: collab spawn failed: agent thread limit reached
+```
+
+The controller proceeded directly because the candidate had a small,
+score-positive owned target: expose the raw `residuePairCountingRemainder`
+input beneath the Round87 uniform shared-prime remainder envelope, while
+separating the already-closed filtered support fact.
+
+Score decision:
+
+```text
+Candidate: termwise shared-prime remainder envelope
+  FinalChainImpact      5
+  ResidualReduction     5
+  VerificationGain      5
+  DecompositionQuality  5
+  ReuseValue            5
+  FalsePropRisk         1
+  IntegrationRisk       1
+  ScopeDriftRisk        0
+  ExpectedDelta         58
+  Decision              execute
+
+Candidate: close filtered-cover tail from termwise bound alone
+  FinalChainImpact      7
+  ResidualReduction     7
+  VerificationGain      2
+  DecompositionQuality  2
+  ReuseValue            3
+  FalsePropRisk         4
+  IntegrationRisk       6
+  ScopeDriftRisk        0
+  ExpectedDelta         30
+  Decision              reject; a small pointwise pair remainder does not by
+                        itself control the absolute filtered-cover support
+                        sum
+```
+
+The new file
+`Gdbh/PathC_ResidueRemainderWitnessCoverFilteredTermwise.lean`, imported from
+`Gdbh.lean`, defines the strictly smaller termwise inputs:
+
+```text
+ResidueSharedPrimeWitnessFilteredCoverPairRemainderEnvelopeAfter
+ResidueSharedPrimeWitnessFilteredCoverSharedPrimeSupportAfter
+ResidueSharedPrimeWitnessFilteredCoverTermwiseDecompositionAfter
+```
+
+It closes the support half algebraically:
+
+```text
+residueWitnessContainingDivisorFamily_mem_inter
+residueSharedPrimeWitnessFilteredCoverSharedPrimeSupportAfter_holds
+```
+
+and bridges the raw pair remainder back to the Round87 input:
+
+```text
+residueSharedPrimeIntersectionPairCountingRemainder_abs_le_pairRemainder_of_nonneg
+residueSharedPrimeIntersectionPairCountingRemainder_abs_le_pairRemainder_of_support
+residueSharedPrimeWitnessFilteredCoverUniformRemainderAfter_of_pairRemainderEnvelope
+residueSharedPrimeWitnessFilteredCoverUniformRemainderAfter_of_termwiseDecomposition
+residueSharedPrimeWitnessFilteredCoverTermwiseDecompositionAfter_of_pairRemainderEnvelope
+```
+
+The new decomposition is:
+
+```text
+raw pair-counting remainder envelope
+  + closed filtered support fact
+  =>
+ResidueSharedPrimeWitnessFilteredCoverUniformRemainderAfter
+  =>
+Round87 filtered-cover tail decomposition route
+```
+
+This round deliberately does not claim the full filtered-cover log-squared
+tail.  The remaining obstruction is the weighted support mass after inserting
+any raw pair-remainder envelope.
+
+Verification for Round 88 passed:
+
+* `lake env lean Gdbh/PathC_ResidueRemainderWitnessCoverFilteredTermwise.lean`
+* `lake build`
+* `python3 audit_lean_source.py`
+* `bash scripts/audit_full.sh`
+* `python3 scripts/regenerate_agents_md.py`
+
+The single-file and full-build checks printed allowed axiom sets for the new
+public theorem dependencies.  The source audit scanned 286 Lean files with no
+banned project assumptions or placeholders.  The full audit reported 285 Lean
+files under `Gdbh/`, 238,032 lines, 7,487 theorem/lemma declarations, 3,116
+definitions, zero genuine `sorry` or `admit`, zero axiom declarations, and
+both headline theorems with exactly `[propext, Classical.choice, Quot.sound]`.
+
+`AGENTS.md` was regenerated and `Agent.md` was synced to the same content.
+
+Next score-positive candidate:
+
+```text
+Candidate: raw pair-counting quotient interval envelope
+  Goal: close a small uniform envelope for
+        residuePairCountingRemainder n d1 d2 by reducing the divisibility
+        conditions to one residue class modulo `Nat.lcm (d1.prod id)
+        (d2.prod id)` and bounding interval-count minus `n / lcm` by an
+        absolute scalar.
+  ExpectedDelta: about 34-40
+  Risk: low-to-moderate; the pair-level bound is arithmetic and safe, but it
+        must not be misreported as closing the absolute filtered-cover
+        support mass.
+```
