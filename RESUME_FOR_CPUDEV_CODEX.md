@@ -33,6 +33,7 @@ Generated from local workspace `/Users/tommy/Downloads/gdbh`.
 18. `Gdbh/PathC_ResidueRemainderWitnessCoverFilteredTailDecomposition.lean`
 19. `Gdbh/PathC_ResidueRemainderWitnessCoverFilteredTermwise.lean`
 20. `Gdbh/PathC_ResiduePairCountingIntervalEnvelope.lean`
+21. `Gdbh/PathC_ResiduePairDivisorSharpEnvelope.lean`
 
 ## Active Goal
 
@@ -75,7 +76,7 @@ Use targeted `#print axioms` probes for individual theorems. Do not run
 
 ## Current Verified State
 
-Latest verified mathematical round in the scoreboard is Round 89.
+Latest verified mathematical round in the scoreboard is Round 90.
 
 Round 75 added the coprime/non-coprime compatible-remainder split:
 
@@ -766,6 +767,51 @@ lines, 7,498 theorem/lemma declarations, 3,119 definitions, zero genuine `sorry`
 or `admit`, zero axiom declarations, and both headline theorems exactly
 `[propext, Classical.choice, Quot.sound]`.
 
+Round 90 closed the sharp D-level CRT envelope:
+
+- `Gdbh/PathC_ResiduePairDivisorSharpEnvelope.lean`
+- import in `Gdbh.lean`
+- main closed residual:
+
+```text
+residuePairDivisorSharpIntervalEnvelope_two :
+  ResiduePairDivisorSharpIntervalEnvelope (2 : ℝ)
+```
+
+The proof decomposes the residual into reusable smaller theorem targets:
+
+```text
+residuePairDivisorCountingRemainder_eq_zero_of_not_gcd_dvd
+residuePairDivisorCondition_iff_modEq_lcm
+residuePairDivisorFullRangeCount_eq_of_gcd_dvd
+residuePairDivisorFullRangeCount_abs_sub_quotient_le_one_of_gcd_dvd
+residuePairDivisorFullRangeCount_eq_iccCount_add_zero
+residuePairDivisorIccCount_abs_sub_fullRangeCount_le_one
+residuePairDivisorCountingRemainder_abs_le_two_of_gcd_dvd
+residuePairDivisorCountingRemainder_abs_le_two_of_pos
+```
+
+Round90 also pushes the constant through the Round89 interfaces:
+
+```text
+residuePairDivisorIntervalEnvelopeAfter_two
+residueSharedPrimeWitnessFilteredCoverPairRemainderEnvelopeAfter_two
+```
+
+Round 90 verification passed:
+
+- `lake env lean Gdbh/PathC_ResiduePairDivisorSharpEnvelope.lean`
+- `lake build`
+- `python3 audit_lean_source.py`
+- `bash scripts/audit_full.sh`
+- `python3 scripts/regenerate_agents_md.py`
+
+The source audit scanned 288 Lean files with no banned project assumptions or
+placeholders.  The full audit reported 287 Lean files under `Gdbh/`, 238,674
+lines, 7,511 theorem/lemma declarations, 3,119 definitions, zero genuine
+`sorry` or `admit`, zero axiom declarations, and both headline theorems exactly
+`[propext, Classical.choice, Quot.sound]`.
+
 ## Most Recent Non-Math Work
 
 The repository was initialized locally, pushed to GitHub, and then updated
@@ -781,48 +827,47 @@ regeneration.
 
 ## Suggested Next Round
 
-Continue with Round 90.
+Continue with Round 91.
 
 Primary candidate:
 
 ```text
-Candidate: sharp pair-counting CRT discrepancy
-  Goal: prove `ResiduePairDivisorSharpIntervalEnvelope 2`, or decompose it
-        into compatibility split plus one residue-class count modulo
-        `Nat.lcm D1 D2`.
-  ExpectedDelta: about 36-44
-  Risk: moderate; existing coprime CRT helpers are private and the general
-        non-coprime branch needs careful compatibility handling.
+Candidate: constant filtered-cover tail insertion
+  Goal: use
+        `residueSharedPrimeWitnessFilteredCoverPairRemainderEnvelopeAfter_two`
+        to instantiate the Round87 tail decomposition with `R n = 2`, then
+        isolate the remaining scalar cardinal-tail Prop.
+  ExpectedDelta: about 28-36
+  Risk: low-to-moderate; the pair remainder is closed, but the support-mass
+        tail still needs an honest cardinality/log-squared inequality.
 ```
 
 Reason:
 
-Round89 exposed the D-level pair-counting envelope and closed a safe `2n`
-baseline:
+Round90 replaces the Round89 `2n` pair-level baseline by a constant `2`
+CRT discrepancy:
 
 ```text
-ResiduePairDivisorSharpIntervalEnvelope B
-  =>
-ResiduePairDivisorIntervalEnvelopeAfter N (fun _ => B)
-  =>
-ResidueSharedPrimeWitnessFilteredCoverPairRemainderEnvelopeAfter
+ResiduePairDivisorSharpIntervalEnvelope 2
+  => ResiduePairDivisorIntervalEnvelopeAfter N (fun _ => 2)
+  => ResidueSharedPrimeWitnessFilteredCoverPairRemainderEnvelopeAfter N (fun _ => 2)
 ```
 
-The next useful step is to replace the `2n` baseline by an O(1) CRT
-discrepancy.  This remains pair-level only and should stay separate from the
-still-open absolute filtered-cover support-mass estimate.
+The next useful step is to connect this constant pair envelope to the existing
+filtered-cover tail decomposition and leave only the scalar support-mass tail
+as the named residual.
 
 Possible additive file:
 
 ```text
-Gdbh/PathC_ResiduePairCountingSharpCRT.lean
+Gdbh/PathC_ResidueFilteredCoverConstantTail.lean
 ```
 
 Possible public theorems:
 
 ```text
-ResiduePairDivisorSharpIntervalEnvelopeTwo
-residuePairDivisorSharpIntervalEnvelope_two
+ResidueSharedPrimeWitnessFilteredCoverConstantTailAfter
+residueSharedPrimeWitnessFilteredCoverLogSquaredUpperAfter_of_constantTail
 ```
 
 Secondary candidate:
@@ -852,4 +897,4 @@ sed -n '1,140p' AGENTS.md
 tail -n 260 pathc_master_scoreboard.md
 ```
 
-Then start Round 90 with the master-controller workflow above.
+Then start Round 91 with the master-controller workflow above.

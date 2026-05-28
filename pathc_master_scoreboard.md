@@ -7302,3 +7302,93 @@ Candidate: sharp pair-counting CRT discrepancy
   Risk: moderate; existing coprime CRT helpers are private and the general
         non-coprime branch needs careful compatibility handling.
 ```
+
+## Round 90 -- Sharp D-level CRT envelope
+
+```text
+Candidate: sharp pair-counting CRT discrepancy
+  FinalChainImpact      5
+  ResidualReduction     5
+  VerificationGain      5
+  DecompositionQuality  5
+  ReuseValue            5
+  FalsePropRisk         1
+  IntegrationRisk       1
+  ScopeDriftRisk        0
+  ExpectedDelta         59
+  Decision              executed
+```
+
+The new file
+`Gdbh/PathC_ResiduePairDivisorSharpEnvelope.lean`, imported from
+`Gdbh.lean`, closes the Round 89 D-level residual:
+
+```text
+residuePairDivisorSharpIntervalEnvelope_two :
+  ResiduePairDivisorSharpIntervalEnvelope (2 : ℝ)
+```
+
+The closure is decomposed into reusable smaller theorem targets:
+
+```text
+residuePairDivisorCountingRemainder_eq_zero_of_not_gcd_dvd
+residuePairDivisorCondition_iff_modEq_lcm
+residuePairDivisorFullRangeCount_eq_of_gcd_dvd
+residuePairDivisorFullRangeCount_abs_sub_quotient_le_one_of_gcd_dvd
+residuePairDivisorFullRangeCount_eq_iccCount_add_zero
+residuePairDivisorIccCount_abs_sub_fullRangeCount_le_one
+residuePairDivisorCountingRemainder_abs_le_two_of_gcd_dvd
+residuePairDivisorCountingRemainder_abs_le_two_of_pos
+```
+
+The closed sharp constant is also pushed through the Round 89 bridges:
+
+```text
+residuePairDivisorIntervalEnvelopeAfter_two
+residueSharedPrimeWitnessFilteredCoverPairRemainderEnvelopeAfter_two
+```
+
+The proof avoids the earlier coprime-only CRT limitation by using
+`Nat.chineseRemainder'` on the compatible condition
+`0 ≡ n [MOD Nat.gcd D1 D2]`, then counts the resulting single class modulo
+`Nat.lcm D1 D2` with `Nat.count_modEq_card`.  The `Ico 0 n` count is within
+one unit of the real quotient, and removing endpoint `0` to obtain
+`Icc 1 (n - 1)` costs at most one more unit.
+
+Verification passed:
+
+```text
+lake env lean Gdbh/PathC_ResiduePairDivisorSharpEnvelope.lean
+lake build
+python3 audit_lean_source.py
+bash scripts/audit_full.sh
+python3 scripts/regenerate_agents_md.py
+```
+
+The printed axiom dependencies for the new public sharp-envelope theorem and
+its main sublemmas and bridge theorems are exactly
+`[propext, Classical.choice, Quot.sound]`.
+The source audit scanned 288 Lean files with no banned project assumptions or
+placeholders.  The full audit reported 287 Lean files under `Gdbh/`, 238,674
+lines, 7,511 theorem/lemma declarations, 3,119 definitions, zero genuine
+`sorry` or `admit`, zero axiom declarations, and both headline theorems with
+exactly `[propext, Classical.choice, Quot.sound]`.
+
+Scout status: the no-edit scout threads did not provide a usable report before
+the controller proof and verification completed.  The result is still aligned
+with their brief: the controller used the mathlib residue-count theorem
+`Nat.count_modEq_card`, the local Round89 bridge, and the non-coprime CRT
+compatibility condition via `Nat.chineseRemainder'`.
+
+Next score-positive candidate:
+
+```text
+Candidate: constant filtered-cover tail insertion
+  Goal: instantiate the Round87 filtered-cover tail decomposition with
+        `R n = 2` using
+        `residueSharedPrimeWitnessFilteredCoverPairRemainderEnvelopeAfter_two`,
+        then isolate the remaining scalar cardinal-tail inequality.
+  ExpectedDelta: about 28-36
+  Risk: low-to-moderate; the pair-level CRT error is closed, but the support
+        mass/log-squared tail remains the honest bottleneck.
+```
