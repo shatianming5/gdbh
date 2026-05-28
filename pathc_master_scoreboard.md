@@ -7392,3 +7392,86 @@ Candidate: constant filtered-cover tail insertion
   Risk: low-to-moderate; the pair-level CRT error is closed, but the support
         mass/log-squared tail remains the honest bottleneck.
 ```
+
+## Round 91 -- Sharp filtered-cover tail reduction
+
+```text
+Candidate: constant filtered-cover tail insertion
+  FinalChainImpact      4
+  ResidualReduction     4
+  VerificationGain      4
+  DecompositionQuality  5
+  ReuseValue            4
+  FalsePropRisk         1
+  IntegrationRisk       1
+  ScopeDriftRisk        0
+  ExpectedDelta         45
+  Decision              executed
+```
+
+The new file
+`Gdbh/PathC_ResidueRemainderWitnessCoverFilteredSharpTail.lean`, imported
+from `Gdbh.lean`, inserts the Round 90 `R n = 2` pair envelope into the
+Round 87 filtered-cover tail decomposition.
+
+Closed termwise bridge:
+
+```text
+residueSharedPrimeWitnessFilteredCoverUniformRemainderAfter_two
+residueSharedPrimeWitnessFilteredCoverTermwiseDecompositionAfter_two
+```
+
+New smaller residuals:
+
+```text
+ResidueSharedPrimeWitnessFilteredCoverTwoCardinalityTailAfter
+ResidueSharedPrimeWitnessFilteredCoverSharpTailResidualAfter
+```
+
+Public bridges:
+
+```text
+residueSharedPrimeWitnessFilteredCoverTailDecompositionAfter_two_of_sharpTailResidual
+residueSharedPrimeWitnessFilteredCoverWeightedPrimeTailAfter_of_sharpTailResidual
+residueSharedPrimeWitnessFilteredCoverLogSquaredUpperAfter_of_sharpTailResidual
+```
+
+This round does not claim the support-mass/log-squared estimate.  It makes
+the remaining filtered-cover bottleneck explicit:
+
+```text
+divisor-family cardinality envelope
+  + scalar cardinal-tail inequality with R n = 2
+  =>
+existing filtered-cover log-squared worker
+```
+
+Verification passed:
+
+```text
+lake env lean Gdbh/PathC_ResidueRemainderWitnessCoverFilteredSharpTail.lean
+lake build
+python3 audit_lean_source.py
+bash scripts/audit_full.sh
+python3 scripts/regenerate_agents_md.py
+```
+
+The printed axiom dependencies for the new public theorems are exactly
+`[propext, Classical.choice, Quot.sound]`.  The source audit scanned 289 Lean
+files with no banned project assumptions or placeholders.  The full audit
+reported 288 Lean files under `Gdbh/`, 238,802 lines, 7,516 theorem/lemma
+declarations, 3,121 definitions, zero genuine `sorry` or `admit`, zero axiom
+declarations, and both headline theorems with exactly
+`[propext, Classical.choice, Quot.sound]`.
+
+Next score-positive candidate:
+
+```text
+Candidate: filtered-cover support-mass tail residual
+  Goal: decompose `ResidueSharedPrimeWitnessFilteredCoverSharpTailResidualAfter`
+        into explicit cardinality controls plus a separately named scalar
+        support-tail estimate.
+  ExpectedDelta: about 24-32
+  Risk: moderate; avoid any pointwise singular-series/log-log claim and keep
+        this as an honest support-mass decomposition.
+```

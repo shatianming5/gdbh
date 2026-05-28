@@ -34,6 +34,7 @@ Generated from local workspace `/Users/tommy/Downloads/gdbh`.
 19. `Gdbh/PathC_ResidueRemainderWitnessCoverFilteredTermwise.lean`
 20. `Gdbh/PathC_ResiduePairCountingIntervalEnvelope.lean`
 21. `Gdbh/PathC_ResiduePairDivisorSharpEnvelope.lean`
+22. `Gdbh/PathC_ResidueRemainderWitnessCoverFilteredSharpTail.lean`
 
 ## Active Goal
 
@@ -76,7 +77,7 @@ Use targeted `#print axioms` probes for individual theorems. Do not run
 
 ## Current Verified State
 
-Latest verified mathematical round in the scoreboard is Round 90.
+Latest verified mathematical round in the scoreboard is Round 91.
 
 Round 75 added the coprime/non-coprime compatible-remainder split:
 
@@ -812,6 +813,57 @@ lines, 7,511 theorem/lemma declarations, 3,119 definitions, zero genuine
 `sorry` or `admit`, zero axiom declarations, and both headline theorems exactly
 `[propext, Classical.choice, Quot.sound]`.
 
+Round 91 inserted the Round90 two-unit pair envelope into the filtered-cover
+tail decomposition:
+
+- `Gdbh/PathC_ResidueRemainderWitnessCoverFilteredSharpTail.lean`
+- import in `Gdbh.lean`
+- closed termwise/tail bridge:
+
+```text
+residueSharedPrimeWitnessFilteredCoverUniformRemainderAfter_two
+residueSharedPrimeWitnessFilteredCoverTermwiseDecompositionAfter_two
+```
+
+New residual names:
+
+```text
+ResidueSharedPrimeWitnessFilteredCoverTwoCardinalityTailAfter
+ResidueSharedPrimeWitnessFilteredCoverSharpTailResidualAfter
+```
+
+Public bridges:
+
+```text
+residueSharedPrimeWitnessFilteredCoverTailDecompositionAfter_two_of_sharpTailResidual
+residueSharedPrimeWitnessFilteredCoverWeightedPrimeTailAfter_of_sharpTailResidual
+residueSharedPrimeWitnessFilteredCoverLogSquaredUpperAfter_of_sharpTailResidual
+```
+
+Meaning:
+
+```text
+Round90 pair envelope R n = 2
+  + divisor-family cardinality controls
+  + scalar cardinal-tail inequality with R n = 2
+  =>
+existing filtered-cover log-squared worker
+```
+
+Round 91 verification passed:
+
+- `lake env lean Gdbh/PathC_ResidueRemainderWitnessCoverFilteredSharpTail.lean`
+- `lake build`
+- `python3 audit_lean_source.py`
+- `bash scripts/audit_full.sh`
+- `python3 scripts/regenerate_agents_md.py`
+
+The source audit scanned 289 Lean files with no banned project assumptions or
+placeholders.  The full audit reported 288 Lean files under `Gdbh/`, 238,802
+lines, 7,516 theorem/lemma declarations, 3,121 definitions, zero genuine
+`sorry` or `admit`, zero axiom declarations, and both headline theorems exactly
+`[propext, Classical.choice, Quot.sound]`.
+
 ## Most Recent Non-Math Work
 
 The repository was initialized locally, pushed to GitHub, and then updated
@@ -827,47 +879,45 @@ regeneration.
 
 ## Suggested Next Round
 
-Continue with Round 91.
+Continue with Round 92.
 
 Primary candidate:
 
 ```text
-Candidate: constant filtered-cover tail insertion
-  Goal: use
-        `residueSharedPrimeWitnessFilteredCoverPairRemainderEnvelopeAfter_two`
-        to instantiate the Round87 tail decomposition with `R n = 2`, then
-        isolate the remaining scalar cardinal-tail Prop.
-  ExpectedDelta: about 28-36
-  Risk: low-to-moderate; the pair remainder is closed, but the support-mass
-        tail still needs an honest cardinality/log-squared inequality.
+Candidate: filtered-cover support-mass tail residual
+  Goal: decompose
+        `ResidueSharedPrimeWitnessFilteredCoverSharpTailResidualAfter`
+        into explicit cardinality controls and a scalar tail estimate that can
+        be attacked separately without claiming pointwise singular-series
+        log-log bounds.
+  ExpectedDelta: about 24-32
+  Risk: moderate; the remaining work is the honest support-mass bottleneck.
 ```
 
 Reason:
 
-Round90 replaces the Round89 `2n` pair-level baseline by a constant `2`
-CRT discrepancy:
+Round91 already inserted the Round90 `R n = 2` pair envelope:
 
 ```text
-ResiduePairDivisorSharpIntervalEnvelope 2
-  => ResiduePairDivisorIntervalEnvelopeAfter N (fun _ => 2)
-  => ResidueSharedPrimeWitnessFilteredCoverPairRemainderEnvelopeAfter N (fun _ => 2)
+ResidueSharedPrimeWitnessFilteredCoverSharpTailResidualAfter
+  =>
+ResidueSharedPrimeWitnessFilteredCoverLogSquaredUpperAfter
 ```
 
-The next useful step is to connect this constant pair envelope to the existing
-filtered-cover tail decomposition and leave only the scalar support-mass tail
-as the named residual.
+The next useful step is to attack the residual itself by splitting the
+cardinality controls from the scalar weighted support tail.
 
 Possible additive file:
 
 ```text
-Gdbh/PathC_ResidueFilteredCoverConstantTail.lean
+Gdbh/PathC_ResidueFilteredCoverSharpTailSupport.lean
 ```
 
 Possible public theorems:
 
 ```text
-ResidueSharedPrimeWitnessFilteredCoverConstantTailAfter
-residueSharedPrimeWitnessFilteredCoverLogSquaredUpperAfter_of_constantTail
+ResidueSharedPrimeWitnessFilteredCoverSharpTailSupportAfter
+residueSharedPrimeWitnessFilteredCoverSharpTailResidualAfter_of_supportTail
 ```
 
 Secondary candidate:
@@ -897,4 +947,4 @@ sed -n '1,140p' AGENTS.md
 tail -n 260 pathc_master_scoreboard.md
 ```
 
-Then start Round 91 with the master-controller workflow above.
+Then start Round 92 with the master-controller workflow above.
