@@ -6771,3 +6771,132 @@ Candidate: finite/tail split adapter for filtered-cover branch
   Risk: moderate; useful only if it preserves the existing eventual worker
         shape and avoids pretending the finite-prefix constant is uniform
 ```
+
+## Round 86 - filtered-cover finite/tail threshold split
+
+Controller status:
+
+One Round86 scout was requested but failed before starting because the
+tool-layer thread limit remains occupied by stale agent entries:
+
+```text
+round86_eventual_worker_scout failed: collab spawn failed: agent thread limit reached
+```
+
+The controller proceeded directly after inspecting the existing filtered-cover
+eventual worker and the neighboring relative-remainder threshold split.  This
+was score-positive because Round85 already closed the bounded prefix for every
+fixed threshold, and the remaining tail worker is exactly the existing honest
+large-range filtered-cover estimate.
+
+Score decision:
+
+```text
+Candidate: finite/tail split adapter for filtered-cover branch
+  FinalChainImpact      5
+  ResidualReduction     5
+  VerificationGain      8
+  DecompositionQuality  8
+  ReuseValue            8
+  FalsePropRisk         0
+  IntegrationRisk       3
+  ScopeDriftRisk        0
+  ExpectedDelta         33
+  Decision              execute
+
+Candidate: use threshold split to claim eventual filtered-cover closure
+  FinalChainImpact      7
+  ResidualReduction     8
+  VerificationGain      2
+  DecompositionQuality  3
+  ReuseValue            4
+  FalsePropRisk         3
+  IntegrationRisk       6
+  ScopeDriftRisk        1
+  ExpectedDelta         28
+  Decision              reject as stated; threshold split is equivalent to
+                        the existing eventual tail worker, not a closure
+
+Candidate: direct analytic filtered-cover log-squared closure
+  FinalChainImpact      8
+  ResidualReduction     10
+  VerificationGain      2
+  DecompositionQuality  3
+  ReuseValue            3
+  FalsePropRisk         4
+  IntegrationRisk       8
+  ScopeDriftRisk        0
+  ExpectedDelta         34
+  Decision              defer
+```
+
+The new file
+`Gdbh/PathC_ResidueRemainderWitnessCoverFilteredThresholdSplit.lean`, imported
+from `Gdbh.lean`, defines the full-range and finite/tail split interfaces:
+
+```text
+ResidueSharedPrimeWitnessFilteredCoverLogSquaredFixedAtSqrt
+ResidueSharedPrimeWitnessFilteredCoverLogSquaredThresholdSplitAtSqrt
+ResidueSharedPrimeWitnessFilteredCoverLogSquaredThresholdSplit
+```
+
+It proves recombination and equivalence to the existing eventual worker:
+
+```text
+residueSharedPrimeWitnessFilteredCoverLogSquaredFixedAtSqrt_of_thresholdSplitAtSqrt
+residueSharedPrimeWitnessFilteredCoverLogSquaredWithConstant_of_thresholdSplitAtSqrt
+residueSharedPrimeWitnessFilteredCoverLogSquaredUpperEventually_of_thresholdSplit
+residueSharedPrimeWitnessFilteredCoverLogSquaredThresholdSplitAtSqrt_of_after
+residueSharedPrimeWitnessFilteredCoverLogSquaredThresholdSplit_of_eventually
+residueSharedPrimeWitnessFilteredCoverLogSquaredThresholdSplit_iff_eventually
+```
+
+The important meaning is:
+
+```text
+existing tail worker at threshold N
+  =>
+Round85 explicit finite prefix at N + existing tail worker at N
+  =>
+threshold-split package
+```
+
+and conversely the threshold-split package supplies the existing eventual
+worker by keeping its tail half.  Therefore this round makes the finite prefix
+explicit and closed; it does not close the large-range analytic estimate.
+
+The file also adds a final-chain adapter:
+
+```text
+ResidueCompatibleRemainderFilteredCoverThresholdSplitLogSquaredUpperEventually
+residueCompatibleRemainderFilteredCoverSplitLogSquaredUpperEventually_of_thresholdSplit
+pathC_kGoldbach_of_compatibleRemainderFilteredCoverThresholdSplit_and_countingInput
+```
+
+Verification for Round 86 passed:
+
+* `lake env lean Gdbh/PathC_ResidueRemainderWitnessCoverFilteredThresholdSplit.lean`
+* `lake build`
+* `python3 audit_lean_source.py`
+* `bash scripts/audit_full.sh`
+* `python3 scripts/regenerate_agents_md.py`
+
+The single-file and full-build checks printed allowed axiom sets for the new
+public theorem dependencies.  The source audit scanned 284 Lean files with no
+banned project assumptions or placeholders.  The full audit reported 283 Lean
+files under `Gdbh/`, 237,513 lines, 7,474 theorem/lemma declarations, 3,106
+definitions, zero genuine `sorry` or `admit`, zero axiom declarations, and
+both headline theorems with exactly `[propext, Classical.choice, Quot.sound]`.
+
+Next score-positive candidate:
+
+```text
+Candidate: filtered-cover tail decomposition
+  Goal: decompose the remaining
+        ResidueSharedPrimeWitnessFilteredCoverLogSquaredUpperAfter N A
+        into a strictly smaller weighted witness-prime tail estimate and a
+        divisor-family cardinal estimate.
+  ExpectedDelta: about 32-36
+  Risk: moderate; must not use the crude finite cardinal envelope as a
+        large-range log-squared proof
+```

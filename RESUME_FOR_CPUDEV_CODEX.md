@@ -542,6 +542,65 @@ lines, 7,466 theorem/lemma declarations, 3,102 definitions, zero genuine `sorry`
 or `admit`, zero axiom declarations, and both headline theorems exactly
 `[propext, Classical.choice, Quot.sound]`.
 
+Round 86 added the filtered-cover finite/tail threshold split:
+
+- `Gdbh/PathC_ResidueRemainderWitnessCoverFilteredThresholdSplit.lean`
+- import in `Gdbh.lean`
+- full-range and threshold-split interfaces:
+
+```text
+ResidueSharedPrimeWitnessFilteredCoverLogSquaredFixedAtSqrt
+ResidueSharedPrimeWitnessFilteredCoverLogSquaredThresholdSplitAtSqrt
+ResidueSharedPrimeWitnessFilteredCoverLogSquaredThresholdSplit
+```
+
+Recombination and equivalence to the existing eventual tail worker:
+
+```text
+residueSharedPrimeWitnessFilteredCoverLogSquaredFixedAtSqrt_of_thresholdSplitAtSqrt
+residueSharedPrimeWitnessFilteredCoverLogSquaredWithConstant_of_thresholdSplitAtSqrt
+residueSharedPrimeWitnessFilteredCoverLogSquaredUpperEventually_of_thresholdSplit
+residueSharedPrimeWitnessFilteredCoverLogSquaredThresholdSplitAtSqrt_of_after
+residueSharedPrimeWitnessFilteredCoverLogSquaredThresholdSplit_of_eventually
+residueSharedPrimeWitnessFilteredCoverLogSquaredThresholdSplit_iff_eventually
+```
+
+Final-chain adapter:
+
+```text
+ResidueCompatibleRemainderFilteredCoverThresholdSplitLogSquaredUpperEventually
+residueCompatibleRemainderFilteredCoverSplitLogSquaredUpperEventually_of_thresholdSplit
+pathC_kGoldbach_of_compatibleRemainderFilteredCoverThresholdSplit_and_countingInput
+```
+
+Meaning:
+
+```text
+existing tail worker at threshold N
+  =>
+Round85 explicit finite prefix at N + existing tail worker at N
+  =>
+threshold-split package
+```
+
+and the threshold-split package gives back the existing eventual filtered-cover
+worker.  This closes the finite side of the split explicitly but leaves the
+large-range analytic estimate honest and unchanged.
+
+Round 86 verification passed:
+
+- `lake env lean Gdbh/PathC_ResidueRemainderWitnessCoverFilteredThresholdSplit.lean`
+- `lake build`
+- `python3 audit_lean_source.py`
+- `bash scripts/audit_full.sh`
+- `python3 scripts/regenerate_agents_md.py`
+
+The source audit scanned 284 Lean files with no banned project assumptions or
+placeholders.  The full audit reported 283 Lean files under `Gdbh/`, 237,513
+lines, 7,474 theorem/lemma declarations, 3,106 definitions, zero genuine `sorry`
+or `admit`, zero axiom declarations, and both headline theorems exactly
+`[propext, Classical.choice, Quot.sound]`.
+
 ## Most Recent Non-Math Work
 
 The repository was initialized locally, pushed to GitHub, and then updated
@@ -557,44 +616,46 @@ regeneration.
 
 ## Suggested Next Round
 
-Continue with Round 86.
+Continue with Round 87.
 
 Primary candidate:
 
 ```text
-Candidate: finite/tail split adapter for filtered-cover branch
-  Goal: combine the new bounded-prefix log-squared bridge with an explicit
-        tail worker shape, so future large-range estimates only need to handle
-        Nat.sqrt n > N for a named N.
-  ExpectedDelta: about 30-34
-  Risk: moderate; useful only if it preserves the existing eventual worker
-        shape and avoids pretending the finite-prefix constant is uniform
+Candidate: filtered-cover tail decomposition
+  Goal: decompose the remaining
+        ResidueSharedPrimeWitnessFilteredCoverLogSquaredUpperAfter N A
+        into a strictly smaller weighted witness-prime tail estimate and a
+        divisor-family cardinal estimate.
+  ExpectedDelta: about 32-36
+  Risk: moderate; must not use the crude finite cardinal envelope as a
+        large-range log-squared proof
 ```
 
 Reason:
 
-Round85 proves a bounded-prefix log-squared estimate:
+Round86 proved the bounded-prefix/tail packaging:
 
 ```text
-Nat.sqrt n <= N
-  =>
-filtered cover at sqrt <= C(N) * n / (log n)^2
+existing tail worker at threshold N
+  <=>
+threshold split with Round85 finite prefix closed
 ```
 
-The next useful integration step is to expose a clean threshold split:
-bounded prefix handled by Round85, tail left as the honest analytic worker.
+The remaining mathematical content is still the tail estimate.  The next useful
+step is to decompose that tail into named smaller Props without pretending the
+finite cardinal envelope is uniform in the large range.
 
 Possible additive file:
 
 ```text
-Gdbh/PathC_ResidueRemainderWitnessCoverFilteredThresholdSplit.lean
+Gdbh/PathC_ResidueRemainderWitnessCoverFilteredTailDecomposition.lean
 ```
 
 Possible public theorems:
 
 ```text
-residueSharedPrimeWitnessFilteredCoverLogSquaredUpperAfter_of_thresholdSplit
-ResidueSharedPrimeWitnessFilteredCoverLogSquaredThresholdSplit
+ResidueSharedPrimeWitnessFilteredCoverWeightedPrimeTailAfter
+ResidueSharedPrimeWitnessFilteredCoverDivisorFamilyTailAfter
 ```
 
 Secondary candidate:
@@ -624,4 +685,4 @@ sed -n '1,140p' AGENTS.md
 tail -n 260 pathc_master_scoreboard.md
 ```
 
-Then start Round 85 with the master-controller workflow above.
+Then start Round 87 with the master-controller workflow above.
