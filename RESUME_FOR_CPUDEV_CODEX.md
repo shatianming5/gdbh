@@ -24,6 +24,7 @@ Generated from local workspace `/Users/tommy/Downloads/gdbh`.
 9. `Gdbh/PathC_ResidueRemainderSharedPrimeWitness.lean`
 10. `Gdbh/PathC_ResidueRemainderWitnessDivisorPartition.lean`
 11. `Gdbh/PathC_ResidueRemainderWitnessCover.lean`
+12. `Gdbh/PathC_ResidueRemainderWitnessCoverRearrange.lean`
 
 ## Active Goal
 
@@ -66,7 +67,7 @@ Use targeted `#print axioms` probes for individual theorems. Do not run
 
 ## Current Verified State
 
-Latest verified mathematical round in the scoreboard is Round 80.
+Latest verified mathematical round in the scoreboard is Round 81.
 
 Round 75 added the coprime/non-coprime compatible-remainder split:
 
@@ -252,17 +253,55 @@ pathC_kGoldbach_of_compatibleRemainderWitnessCoverSplit_and_countingInput
 
 This is a nonnegative finite cover, not a disjoint partition over witnesses.
 
-Round 80 verification passed:
+Round 81 added the prime-first cover rearrangement:
 
-- `lake env lean Gdbh/PathC_ResidueRemainderWitnessCover.lean`
+- `Gdbh/PathC_ResidueRemainderWitnessCoverRearrange.lean`
+- import in `Gdbh.lean`
+- active worker:
+
+```text
+ResidueCompatibleRemainderPrimeFirstCoverSplitLogSquaredUpperEventually
+  = ResidueCoprimeCompatibleRemainderLogSquaredUpperEventually
+    and ResidueSharedPrimeWitnessPrimeFirstCoverLogSquaredUpperEventually
+  => ResidueCompatibleRemainderWitnessCoverSplitLogSquaredUpperEventually
+  => ResidueCompatibleRemainderDivisorWitnessSplitLogSquaredUpperEventually
+  => ...
+  => Path C K-Goldbach
+```
+
+The cover equality is:
+
+```text
+residueDoubleDivisorSharedPrimeDivisorWitnessCoverSum n z k
+  =
+residueDoubleDivisorSharedPrimeDivisorWitnessPrimeFirstCoverSum n z k
+```
+
+The prime-first form still has the indicator `if p in d1 inter d2`; it is not
+a disjoint witness decomposition.
+
+Key bridges:
+
+```text
+residueDoubleDivisorSharedPrimeDivisorWitnessCoverSum_eq_primeFirst
+residueDoubleDivisorSharedPrimeDivisorWitnessCoverSumAtSqrt_eq_primeFirst
+residueSharedPrimeWitnessCoverLogSquaredUpperEventually_of_primeFirst
+residueCompatibleRemainderWitnessCoverSplitLogSquaredUpperEventually_of_primeFirstSplit
+residueCompatibleRemainderDivisorWitnessSplitLogSquaredUpperEventually_of_primeFirstSplit
+pathC_kGoldbach_of_compatibleRemainderPrimeFirstCoverSplit_and_countingInput
+```
+
+Round 81 verification passed:
+
+- `lake env lean Gdbh/PathC_ResidueRemainderWitnessCoverRearrange.lean`
 - `lake build`
 - `python3 audit_lean_source.py`
 - `bash scripts/audit_full.sh`
 - `python3 scripts/regenerate_agents_md.py`
 
-The source audit scanned 278 Lean files with no banned project assumptions or
-placeholders.  The full audit reported 277 Lean files under `Gdbh/`, 236,160
-lines, 7,429 theorem/lemma declarations, 3,084 definitions, zero genuine `sorry` or
+The source audit scanned 279 Lean files with no banned project assumptions or
+placeholders.  The full audit reported 278 Lean files under `Gdbh/`, 236,407
+lines, 7,436 theorem/lemma declarations, 3,089 definitions, zero genuine `sorry` or
 `admit`, zero axiom declarations, and both headline theorems exactly
 `[propext, Classical.choice, Quot.sound]`.
 
@@ -279,46 +318,50 @@ with a compatibility copy:
 `Agent.md` should remain a compatibility copy of `AGENTS.md` after each
 regeneration.
 
-No Lean mathematical change has been made after Round 80.
+No Lean mathematical change has been made after Round 81.
 
 ## Suggested Next Round
 
-Continue with Round 81.
+Continue with Round 82.
 
 Primary candidate:
 
 ```text
-Candidate: cover-sum rearrangement by witness prime
-  Goal: algebraically rewrite the cover sum as a sum over p in
-        residuePrimeDivisorWitnessSet n z of the pairs containing p
-  ExpectedDelta: about 38-42
-  Risk: moderate, mostly Finset sum_comm and filter bookkeeping
+Candidate: prime-first filtered-support form
+  Goal: replace the inner if p in d1 inter d2 with filters
+        d1 in F.filter (fun d => p in d), d2 in same
+  ExpectedDelta: about 36-40
+  Risk: moderate, mostly Finset.sum_filter bookkeeping
   Execute if Lean proof is small and additive
 ```
 
 Reason:
 
-Round80 made the finite cover upper worker explicit:
+Round81 made the prime-first cover explicit:
 
 ```text
-residueDoubleDivisorSharedPrimeDivisorWitnessCoverSum n z k
+sum p in residuePrimeDivisorWitnessSet n z,
+  sum d1 in F,
+    sum d2 in F,
+      |mu d1 * mu d2| *
+        if p in d1 inter d2 then |pairRemainder n d1 d2| else 0
 ```
 
-The next useful decomposition is to commute the sums so the cover is organized
-by witness prime `p`.  This remains algebraic and still counts overlaps
+The next useful decomposition is to push the indicator into the finite support
+filters for `d1` and `d2`.  This remains algebraic and still counts overlaps
 honestly.
 
 Possible additive file:
 
 ```text
-Gdbh/PathC_ResidueRemainderWitnessCoverRearrange.lean
+Gdbh/PathC_ResidueRemainderWitnessCoverFiltered.lean
 ```
 
 Possible public theorems:
 
 ```text
-residueDoubleDivisorSharedPrimeDivisorWitnessCoverSum_eq_primeFirst
-ResidueSharedPrimeWitnessPrimeFirstCoverLogSquaredUpperEventually
+residueDoubleDivisorSharedPrimeDivisorWitnessPrimeFirstCoverSum_eq_filtered
+ResidueSharedPrimeWitnessFilteredCoverLogSquaredUpperEventually
 ```
 
 Secondary candidate:
@@ -348,4 +391,4 @@ sed -n '1,140p' AGENTS.md
 tail -n 260 pathc_master_scoreboard.md
 ```
 
-Then start Round 81 with the master-controller workflow above.
+Then start Round 82 with the master-controller workflow above.

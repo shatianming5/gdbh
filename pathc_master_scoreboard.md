@@ -6105,3 +6105,146 @@ Candidate: cover-sum rearrangement by witness prime
   ExpectedDelta: about 38-42
   Risk: moderate, mostly Finset sum_comm and filter bookkeeping
 ```
+
+## Round 81 - prime-first witness-cover rearrangement
+
+Controller status:
+
+No new scout could be launched because the tool-layer thread limit is still
+occupied by stale shutdown entries.  The controller proceeded directly because
+the task was a finite-sum rearrangement and the necessary `Finset.sum_comm`
+and `Finset.mul_sum` proof pattern was confirmed locally.
+
+Score decision:
+
+```text
+Candidate: prime-first cover rearrangement
+  FinalChainImpact      5
+  ResidualReduction     5
+  VerificationGain      6
+  DecompositionQuality  8
+  ReuseValue            7
+  FalsePropRisk         0
+  IntegrationRisk       3
+  ScopeDriftRisk        0
+  ExpectedDelta         42
+  Decision              execute
+
+Candidate: filtered pair-containing-p version immediately
+  FinalChainImpact      5
+  ResidualReduction     5
+  VerificationGain      4
+  DecompositionQuality  6
+  ReuseValue            6
+  FalsePropRisk         0
+  IntegrationRisk       5
+  ScopeDriftRisk        0
+  ExpectedDelta         36
+  Decision              defer until prime-first if-form is public
+
+Candidate: direct prime-first analytic log-squared closure
+  FinalChainImpact      8
+  ResidualReduction     10
+  VerificationGain      2
+  DecompositionQuality  3
+  ReuseValue            2
+  FalsePropRisk         4
+  IntegrationRisk       8
+  ScopeDriftRisk        0
+  ExpectedDelta         33
+  Decision              defer
+
+Candidate: scoreboard-only note
+  FinalChainImpact      1
+  ResidualReduction     0
+  VerificationGain      2
+  DecompositionQuality  4
+  ReuseValue            2
+  FalsePropRisk         0
+  IntegrationRisk       0
+  ScopeDriftRisk        1
+  ExpectedDelta         18
+  Decision              defer
+```
+
+The new file `Gdbh/PathC_ResidueRemainderWitnessCoverRearrange.lean`,
+imported from `Gdbh.lean`, commutes the Round80 finite cover so that the outer
+sum is over residue-prime divisor witnesses:
+
+```text
+residueDoubleDivisorSharedPrimeDivisorWitnessCoverSum n z k
+  =
+residueDoubleDivisorSharedPrimeDivisorWitnessPrimeFirstCoverSum n z k
+```
+
+The prime-first cover keeps the overlap indicator:
+
+```text
+sum p in residuePrimeDivisorWitnessSet n z,
+  sum d1 in F,
+    sum d2 in F,
+      |mu d1 * mu d2| *
+        if p in d1 inter d2 then |pairRemainder n d1 d2| else 0
+```
+
+This is not a disjoint decomposition.  It is the same overlapping cover from
+Round80, only rearranged with the witness prime first.
+
+Public definitions and worker Props added:
+
+```text
+residueDoubleDivisorSharedPrimeDivisorWitnessPrimeFirstCoverSum
+residueDoubleDivisorSharedPrimeDivisorWitnessPrimeFirstCoverSumAtSqrt
+ResidueSharedPrimeWitnessPrimeFirstCoverLogSquaredUpperAfter
+ResidueSharedPrimeWitnessPrimeFirstCoverLogSquaredUpperEventually
+ResidueCompatibleRemainderPrimeFirstCoverSplitLogSquaredUpperEventually
+```
+
+Public bridges added:
+
+```text
+residueDoubleDivisorSharedPrimeDivisorWitnessCoverSum_eq_primeFirst
+residueDoubleDivisorSharedPrimeDivisorWitnessCoverSumAtSqrt_eq_primeFirst
+residueSharedPrimeWitnessCoverLogSquaredUpperAfter_of_primeFirst
+residueSharedPrimeWitnessCoverLogSquaredUpperEventually_of_primeFirst
+residueCompatibleRemainderWitnessCoverSplitLogSquaredUpperEventually_of_primeFirstSplit
+residueCompatibleRemainderDivisorWitnessSplitLogSquaredUpperEventually_of_primeFirstSplit
+pathC_kGoldbach_of_compatibleRemainderPrimeFirstCoverSplit_and_countingInput
+```
+
+The active decomposition is now:
+
+```text
+ResidueCompatibleRemainderPrimeFirstCoverSplitLogSquaredUpperEventually
+  = ResidueCoprimeCompatibleRemainderLogSquaredUpperEventually
+    and ResidueSharedPrimeWitnessPrimeFirstCoverLogSquaredUpperEventually
+  => ResidueCompatibleRemainderWitnessCoverSplitLogSquaredUpperEventually
+  => ResidueCompatibleRemainderDivisorWitnessSplitLogSquaredUpperEventually
+  => ...
+  => Path C K-Goldbach
+```
+
+Verification for Round 81 passed:
+
+* `lake env lean Gdbh/PathC_ResidueRemainderWitnessCoverRearrange.lean`
+* `lake build`
+* `python3 audit_lean_source.py`
+* `bash scripts/audit_full.sh`
+* `python3 scripts/regenerate_agents_md.py`
+
+The single-file and full-build checks printed allowed axiom sets for the new
+public theorem dependencies.  The source audit scanned 279 Lean files with no
+banned project assumptions or placeholders.  The full audit reported 278 Lean
+files under `Gdbh/`, 236,407 lines, 7,436 theorem/lemma declarations, 3,089
+definitions, zero genuine `sorry` or `admit`, zero axiom declarations, and
+both headline theorems with exactly `[propext, Classical.choice, Quot.sound]`.
+
+Next score-positive candidate:
+
+```text
+Candidate: prime-first filtered-support form
+  Goal: replace the inner if p in d1 inter d2 with filters
+        d1 in F.filter (fun d => p in d), d2 in same
+  ExpectedDelta: about 36-40
+  Risk: moderate, mostly Finset.sum_filter bookkeeping
+```
