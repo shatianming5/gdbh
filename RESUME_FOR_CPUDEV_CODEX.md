@@ -26,6 +26,7 @@ Generated from local workspace `/Users/tommy/Downloads/gdbh`.
 11. `Gdbh/PathC_ResidueRemainderWitnessCover.lean`
 12. `Gdbh/PathC_ResidueRemainderWitnessCoverRearrange.lean`
 13. `Gdbh/PathC_ResidueRemainderWitnessCoverFiltered.lean`
+14. `Gdbh/PathC_ResidueRemainderWitnessCoverFilteredEnvelope.lean`
 
 ## Active Goal
 
@@ -68,7 +69,7 @@ Use targeted `#print axioms` probes for individual theorems. Do not run
 
 ## Current Verified State
 
-Latest verified mathematical round in the scoreboard is Round 82.
+Latest verified mathematical round in the scoreboard is Round 83.
 
 Round 75 added the coprime/non-coprime compatible-remainder split:
 
@@ -373,6 +374,58 @@ lines, 7,442 theorem/lemma declarations, 3,095 definitions, zero genuine `sorry`
 or `admit`, zero axiom declarations, and both headline theorems exactly
 `[propext, Classical.choice, Quot.sound]`.
 
+Round 83 added the filtered-cover cardinal envelope:
+
+- `Gdbh/PathC_ResidueRemainderWitnessCoverFilteredEnvelope.lean`
+- import in `Gdbh.lean`
+- finite multiplier:
+
+```text
+residueFilteredCoverCardinalityEnvelope M =
+  M * (2^M * 2^M) * 2
+```
+
+Key support/cardinality facts:
+
+```text
+residueWitnessContainingDivisorFamily_card_le_base
+residueWitnessContainingDivisorFamily_card_le_two_pow_of_card_le
+residuePrimeDivisorWitnessSet_card_le_of_residuePrimeSet_card_le
+```
+
+Main envelope bounds:
+
+```text
+residueDoubleDivisorSharedPrimeDivisorWitnessFilteredCoverSum_le_cardinalityEnvelope
+residueDoubleDivisorSharedPrimeDivisorWitnessFilteredCoverSumAtSqrt_le_cardinalityEnvelope
+```
+
+The theorem shape is:
+
+```text
+if (residuePrimeSet z).card <= M then
+  residueDoubleDivisorSharedPrimeDivisorWitnessFilteredCoverSum n z k
+    <= residueFilteredCoverCardinalityEnvelope M * n
+```
+
+This is only a crude finite cardinality envelope.  It is useful as a finite
+fallback and support-size normalization, but it is not an analytic
+large-range log-squared closure.
+
+Round 83 verification passed:
+
+- `lake env lean Gdbh/PathC_ResidueRemainderWitnessCoverFilteredEnvelope.lean`
+- `lake build`
+- `python3 audit_lean_source.py`
+- `bash scripts/audit_full.sh`
+- `python3 scripts/regenerate_agents_md.py`
+
+The source audit scanned 281 Lean files with no banned project assumptions or
+placeholders.  The full audit reported 280 Lean files under `Gdbh/`, 236,995
+lines, 7,454 theorem/lemma declarations, 3,096 definitions, zero genuine `sorry`
+or `admit`, zero axiom declarations, and both headline theorems exactly
+`[propext, Classical.choice, Quot.sound]`.
+
 ## Most Recent Non-Math Work
 
 The repository was initialized locally, pushed to GitHub, and then updated
@@ -388,45 +441,44 @@ regeneration.
 
 ## Suggested Next Round
 
-Continue with Round 83.
+Continue with Round 84.
 
 Primary candidate:
 
 ```text
-Candidate: filtered cover cardinal/envelope bound
-  Goal: isolate the purely finite estimate controlling the filtered pair
-        families for each witness prime before analytic log-squared work
-  ExpectedDelta: about 35-40
-  Risk: moderate, mostly Finset.card/filter and nonnegative sum bounds
+Candidate: residue-prime cardinal input for filtered envelope
+  Goal: connect existing explicit prime-set cardinal bounds to the new
+        filtered-cover envelope for finite or threshold ranges
+  ExpectedDelta: about 32-36
+  Risk: moderate; useful finite fallback, insufficient alone for eventual
+        analytic log-squared closure
   Execute if Lean proof is small and additive
 ```
 
 Reason:
 
-Round82 made the filtered-support cover explicit:
+Round83 proved the crude finite envelope:
 
 ```text
-sum p in residuePrimeDivisorWitnessSet n z,
-  sum d1 in residueWitnessContainingDivisorFamily z k p,
-    sum d2 in residueWitnessContainingDivisorFamily z k p,
-      |mu d1 * mu d2| * |pairRemainder n d1 d2|
+filtered cover <= M * (2^M)^2 * 2n
+whenever (residuePrimeSet z).card <= M
 ```
 
-The next useful decomposition is to separate finite combinatorial support
-size from the analytic pair-remainder bounds, still without claiming a
-disjoint witness-prime partition.
+The next useful decomposition is to feed existing verified cardinal bounds
+into this envelope for explicit finite or threshold ranges, while keeping the
+eventual large-range analytic task separate.
 
 Possible additive file:
 
 ```text
-Gdbh/PathC_ResidueRemainderWitnessCoverFilteredEnvelope.lean
+Gdbh/PathC_ResidueRemainderWitnessCoverFilteredEnvelopeApplications.lean
 ```
 
 Possible public theorems:
 
 ```text
-residueWitnessContainingDivisorFamily_card_le
-residueDoubleDivisorSharedPrimeDivisorWitnessFilteredCoverSum_le_envelope
+residueDoubleDivisorSharedPrimeDivisorWitnessFilteredCoverSumAtSqrt_le_explicitEnvelope_of_sqrt_bound
+residueSharedPrimeWitnessFilteredCoverFiniteRangeFallback
 ```
 
 Secondary candidate:
@@ -456,4 +508,4 @@ sed -n '1,140p' AGENTS.md
 tail -n 260 pathc_master_scoreboard.md
 ```
 
-Then start Round 83 with the master-controller workflow above.
+Then start Round 84 with the master-controller workflow above.

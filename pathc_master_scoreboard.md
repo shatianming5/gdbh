@@ -6393,3 +6393,129 @@ Candidate: filtered cover cardinal/envelope bound
   ExpectedDelta: about 35-40
   Risk: moderate, mostly Finset.card/filter and nonnegative sum bounds
 ```
+
+## Round 83 - filtered cover cardinal envelope
+
+Controller status:
+
+One Round83 scout was requested but failed before starting because the
+tool-layer thread limit remains occupied by stale agent entries:
+
+```text
+round83_cardinality_scout    failed: collab spawn failed: agent thread limit reached
+```
+
+The controller proceeded directly because the task was finite, additive, and
+strictly smaller than the Round82 filtered-cover worker: it only separates
+support cardinalities and a crude `2n` pair-remainder envelope.
+
+Score decision:
+
+```text
+Candidate: filtered cover cardinal/envelope bound
+  FinalChainImpact      5
+  ResidualReduction     5
+  VerificationGain      7
+  DecompositionQuality  7
+  ReuseValue            7
+  FalsePropRisk         0
+  IntegrationRisk       4
+  ScopeDriftRisk        0
+  ExpectedDelta         38
+  Decision              execute
+
+Candidate: direct filtered-cover log-squared closure
+  FinalChainImpact      8
+  ResidualReduction     10
+  VerificationGain      2
+  DecompositionQuality  3
+  ReuseValue            3
+  FalsePropRisk         4
+  IntegrationRisk       8
+  ScopeDriftRisk        0
+  ExpectedDelta         34
+  Decision              defer
+
+Candidate: disjoint witness-prime partition
+  FinalChainImpact      5
+  ResidualReduction     6
+  VerificationGain      1
+  DecompositionQuality  2
+  ReuseValue            1
+  FalsePropRisk         8
+  IntegrationRisk       8
+  ScopeDriftRisk        1
+  ExpectedDelta         -4
+  Decision              reject
+```
+
+The new file
+`Gdbh/PathC_ResidueRemainderWitnessCoverFilteredEnvelope.lean`, imported from
+`Gdbh.lean`, defines the crude finite multiplier
+
+```text
+residueFilteredCoverCardinalityEnvelope M =
+  M * (2^M * 2^M) * 2
+```
+
+and proves support/cardinality facts:
+
+```text
+residueWitnessContainingDivisorFamily_card_le_base
+residueWitnessContainingDivisorFamily_card_le_two_pow_of_card_le
+residuePrimeDivisorWitnessSet_card_le_of_residuePrimeSet_card_le
+```
+
+The main public bounds are:
+
+```text
+residueDoubleDivisorSharedPrimeDivisorWitnessFilteredCoverSum_le_cardinalityEnvelope
+residueDoubleDivisorSharedPrimeDivisorWitnessFilteredCoverSumAtSqrt_le_cardinalityEnvelope
+```
+
+Concretely, if `(residuePrimeSet z).card <= M`, then
+
+```text
+residueDoubleDivisorSharedPrimeDivisorWitnessFilteredCoverSum n z k
+  <= residueFilteredCoverCardinalityEnvelope M * n
+```
+
+This is deliberately only a finite cardinality envelope.  It does not assert
+the large-range analytic log-squared estimate and it does not make witness
+primes disjoint.
+
+The active finite-envelope decomposition is now:
+
+```text
+ResidueSharedPrimeWitnessFilteredCoverLogSquaredUpperEventually
+  <= reduce to sharper large-range estimates than the crude
+     residueFilteredCoverCardinalityEnvelope M * n bound
+  with the verified finite fallback:
+     filtered cover <= M * (2^M)^2 * 2n whenever |residuePrimeSet z| <= M
+```
+
+Verification for Round 83 passed:
+
+* `lake env lean Gdbh/PathC_ResidueRemainderWitnessCoverFilteredEnvelope.lean`
+* `lake build`
+* `python3 audit_lean_source.py`
+* `bash scripts/audit_full.sh`
+* `python3 scripts/regenerate_agents_md.py`
+
+The single-file and full-build checks printed allowed axiom sets for the new
+public theorem dependencies.  The source audit scanned 281 Lean files with no
+banned project assumptions or placeholders.  The full audit reported 280 Lean
+files under `Gdbh/`, 236,995 lines, 7,454 theorem/lemma declarations, 3,096
+definitions, zero genuine `sorry` or `admit`, zero axiom declarations, and
+both headline theorems with exactly `[propext, Classical.choice, Quot.sound]`.
+
+Next score-positive candidate:
+
+```text
+Candidate: residue-prime cardinal input for filtered envelope
+  Goal: connect existing explicit prime-set cardinal bounds to the new
+        filtered-cover envelope for finite or threshold ranges
+  ExpectedDelta: about 32-36
+  Risk: moderate; useful for finite fallback, but insufficient alone for the
+        eventual analytic log-squared branch
+```
