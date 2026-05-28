@@ -6900,3 +6900,143 @@ Candidate: filtered-cover tail decomposition
   Risk: moderate; must not use the crude finite cardinal envelope as a
         large-range log-squared proof
 ```
+
+## Round 87 - filtered-cover tail decomposition
+
+Controller status:
+
+The controller attempted to clear stale shutdown scout entries and spawn a
+Round87 no-edit scout.  The close attempts failed because the stale thread IDs
+were already missing, and the spawn still failed:
+
+```text
+round87_tail_decomposition_scout failed: collab spawn failed: agent thread limit reached
+```
+
+The controller proceeded directly after inspecting the filtered-cover sum,
+the Round83 cardinal envelope, and the Round86 threshold split.  This was
+score-positive because it decomposes the remaining large-range tail worker
+without asserting any analytic closure.
+
+Score decision:
+
+```text
+Candidate: filtered-cover tail decomposition
+  FinalChainImpact      6
+  ResidualReduction     7
+  VerificationGain      8
+  DecompositionQuality  8
+  ReuseValue            8
+  FalsePropRisk         0
+  IntegrationRisk       3
+  ScopeDriftRisk        0
+  ExpectedDelta         37
+  Decision              execute
+
+Candidate: close tail using crude cardinal envelope
+  FinalChainImpact      7
+  ResidualReduction     8
+  VerificationGain      2
+  DecompositionQuality  2
+  ReuseValue            3
+  FalsePropRisk         5
+  IntegrationRisk       7
+  ScopeDriftRisk        0
+  ExpectedDelta         22
+  Decision              reject; finite cardinal envelope grows with the
+                        support and is not a large-range log-squared proof
+
+Candidate: direct analytic filtered-cover closure
+  FinalChainImpact      8
+  ResidualReduction     10
+  VerificationGain      2
+  DecompositionQuality  3
+  ReuseValue            3
+  FalsePropRisk         4
+  IntegrationRisk       8
+  ScopeDriftRisk        0
+  ExpectedDelta         34
+  Decision              defer
+```
+
+The new file
+`Gdbh/PathC_ResidueRemainderWitnessCoverFilteredTailDecomposition.lean`,
+imported from `Gdbh.lean`, defines a weighted scalar envelope for the
+filtered cover:
+
+```text
+residueFilteredCoverRemainderEnvelopeWeightedSum
+residueFilteredCoverRemainderEnvelopeWeightedSumAtSqrt
+```
+
+It then names three strictly smaller tail inputs:
+
+```text
+ResidueSharedPrimeWitnessFilteredCoverUniformRemainderAfter
+ResidueSharedPrimeWitnessFilteredCoverWeightedPrimeTailAfter
+ResidueSharedPrimeWitnessFilteredCoverDivisorFamilyCardinalityAfter
+ResidueSharedPrimeWitnessFilteredCoverCardinalityTailAfter
+ResidueSharedPrimeWitnessFilteredCoverTailDecompositionAfter
+```
+
+The bridge structure is:
+
+```text
+uniform termwise remainder envelope
+  + weighted-prime tail estimate
+  =>
+ResidueSharedPrimeWitnessFilteredCoverLogSquaredUpperAfter
+
+divisor-family cardinality envelope
+  + scalar cardinal-tail inequality
+  =>
+weighted-prime tail estimate
+
+bundled Round87 decomposition
+  =>
+ResidueSharedPrimeWitnessFilteredCoverLogSquaredUpperAfter
+```
+
+Public bridge theorems:
+
+```text
+residueDoubleDivisorSharedPrimeDivisorWitnessFilteredCoverSumAtSqrt_le_remainderEnvelopeWeightedSum
+residueSharedPrimeWitnessFilteredCoverLogSquaredUpperAfter_of_remainderEnvelope_and_weightedPrimeTail
+residueFilteredCoverRemainderEnvelopeWeightedSumAtSqrt_le_cardinality
+residueSharedPrimeWitnessFilteredCoverWeightedPrimeTailAfter_of_cardinalityTail
+residueSharedPrimeWitnessFilteredCoverLogSquaredUpperAfter_of_tailDecomposition
+```
+
+This round deliberately leaves the analytic task in
+`ResidueSharedPrimeWitnessFilteredCoverCardinalityTailAfter` and the termwise
+remainder envelope.  It does not convert the crude finite cardinal envelope
+into an eventual log-squared bound.
+
+Verification for Round 87 passed:
+
+* `lake env lean Gdbh/PathC_ResidueRemainderWitnessCoverFilteredTailDecomposition.lean`
+* `lake build`
+* `python3 audit_lean_source.py`
+* `bash scripts/audit_full.sh`
+* `python3 scripts/regenerate_agents_md.py`
+
+The single-file and full-build checks printed allowed axiom sets for the new
+public theorem dependencies.  The source audit scanned 285 Lean files with no
+banned project assumptions or placeholders.  The full audit reported 284 Lean
+files under `Gdbh/`, 237,823 lines, 7,480 theorem/lemma declarations, 3,113
+definitions, zero genuine `sorry` or `admit`, zero axiom declarations, and
+both headline theorems with exactly `[propext, Classical.choice, Quot.sound]`.
+
+Next score-positive candidate:
+
+```text
+Candidate: termwise shared-prime remainder envelope
+  Goal: split
+        ResidueSharedPrimeWitnessFilteredCoverUniformRemainderAfter
+        into a quotient-remainder bound and a shared-prime divisibility
+        support condition, reusing existing `residuePairCountingRemainder`
+        interfaces where possible.
+  ExpectedDelta: about 30-34
+  Risk: moderate; must avoid turning the trivial `2n` pointwise bound into
+        a false log-squared tail claim
+```

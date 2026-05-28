@@ -601,6 +601,65 @@ lines, 7,474 theorem/lemma declarations, 3,106 definitions, zero genuine `sorry`
 or `admit`, zero axiom declarations, and both headline theorems exactly
 `[propext, Classical.choice, Quot.sound]`.
 
+Round 87 added the filtered-cover tail decomposition:
+
+- `Gdbh/PathC_ResidueRemainderWitnessCoverFilteredTailDecomposition.lean`
+- import in `Gdbh.lean`
+- weighted scalar envelope:
+
+```text
+residueFilteredCoverRemainderEnvelopeWeightedSum
+residueFilteredCoverRemainderEnvelopeWeightedSumAtSqrt
+```
+
+Smaller tail inputs:
+
+```text
+ResidueSharedPrimeWitnessFilteredCoverUniformRemainderAfter
+ResidueSharedPrimeWitnessFilteredCoverWeightedPrimeTailAfter
+ResidueSharedPrimeWitnessFilteredCoverDivisorFamilyCardinalityAfter
+ResidueSharedPrimeWitnessFilteredCoverCardinalityTailAfter
+ResidueSharedPrimeWitnessFilteredCoverTailDecompositionAfter
+```
+
+Public bridges:
+
+```text
+residueDoubleDivisorSharedPrimeDivisorWitnessFilteredCoverSumAtSqrt_le_remainderEnvelopeWeightedSum
+residueSharedPrimeWitnessFilteredCoverLogSquaredUpperAfter_of_remainderEnvelope_and_weightedPrimeTail
+residueFilteredCoverRemainderEnvelopeWeightedSumAtSqrt_le_cardinality
+residueSharedPrimeWitnessFilteredCoverWeightedPrimeTailAfter_of_cardinalityTail
+residueSharedPrimeWitnessFilteredCoverLogSquaredUpperAfter_of_tailDecomposition
+```
+
+Meaning:
+
+```text
+uniform termwise remainder envelope
+  + weighted-prime tail estimate
+  =>
+ResidueSharedPrimeWitnessFilteredCoverLogSquaredUpperAfter
+
+divisor-family cardinality envelope
+  + scalar cardinal-tail inequality
+  =>
+weighted-prime tail estimate
+```
+
+Round 87 verification passed:
+
+- `lake env lean Gdbh/PathC_ResidueRemainderWitnessCoverFilteredTailDecomposition.lean`
+- `lake build`
+- `python3 audit_lean_source.py`
+- `bash scripts/audit_full.sh`
+- `python3 scripts/regenerate_agents_md.py`
+
+The source audit scanned 285 Lean files with no banned project assumptions or
+placeholders.  The full audit reported 284 Lean files under `Gdbh/`, 237,823
+lines, 7,480 theorem/lemma declarations, 3,113 definitions, zero genuine `sorry`
+or `admit`, zero axiom declarations, and both headline theorems exactly
+`[propext, Classical.choice, Quot.sound]`.
+
 ## Most Recent Non-Math Work
 
 The repository was initialized locally, pushed to GitHub, and then updated
@@ -616,46 +675,47 @@ regeneration.
 
 ## Suggested Next Round
 
-Continue with Round 87.
+Continue with Round 88.
 
 Primary candidate:
 
 ```text
-Candidate: filtered-cover tail decomposition
-  Goal: decompose the remaining
-        ResidueSharedPrimeWitnessFilteredCoverLogSquaredUpperAfter N A
-        into a strictly smaller weighted witness-prime tail estimate and a
-        divisor-family cardinal estimate.
-  ExpectedDelta: about 32-36
-  Risk: moderate; must not use the crude finite cardinal envelope as a
-        large-range log-squared proof
+Candidate: termwise shared-prime remainder envelope
+  Goal: split
+        ResidueSharedPrimeWitnessFilteredCoverUniformRemainderAfter
+        into a quotient-remainder bound and a shared-prime divisibility
+        support condition, reusing existing `residuePairCountingRemainder`
+        interfaces where possible.
+  ExpectedDelta: about 30-34
+  Risk: moderate; must avoid turning the trivial `2n` pointwise bound into
+        a false log-squared tail claim
 ```
 
 Reason:
 
-Round86 proved the bounded-prefix/tail packaging:
+Round87 decomposed the filtered-cover tail:
 
 ```text
-existing tail worker at threshold N
-  <=>
-threshold split with Round85 finite prefix closed
+uniform termwise remainder envelope
+  + weighted/cardinality tail estimates
+  =>
+filtered-cover tail worker
 ```
 
-The remaining mathematical content is still the tail estimate.  The next useful
-step is to decompose that tail into named smaller Props without pretending the
-finite cardinal envelope is uniform in the large range.
+The next useful step is to decompose the uniform termwise remainder envelope,
+separating raw quotient-counting error from shared-prime support conditions.
 
 Possible additive file:
 
 ```text
-Gdbh/PathC_ResidueRemainderWitnessCoverFilteredTailDecomposition.lean
+Gdbh/PathC_ResidueRemainderWitnessCoverFilteredTermwise.lean
 ```
 
 Possible public theorems:
 
 ```text
-ResidueSharedPrimeWitnessFilteredCoverWeightedPrimeTailAfter
-ResidueSharedPrimeWitnessFilteredCoverDivisorFamilyTailAfter
+ResidueSharedPrimeWitnessFilteredCoverPairRemainderEnvelopeAfter
+ResidueSharedPrimeWitnessFilteredCoverSharedPrimeSupportAfter
 ```
 
 Secondary candidate:
@@ -685,4 +745,4 @@ sed -n '1,140p' AGENTS.md
 tail -n 260 pathc_master_scoreboard.md
 ```
 
-Then start Round 87 with the master-controller workflow above.
+Then start Round 88 with the master-controller workflow above.
