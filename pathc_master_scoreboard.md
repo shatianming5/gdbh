@@ -7161,3 +7161,144 @@ Candidate: raw pair-counting quotient interval envelope
         must not be misreported as closing the absolute filtered-cover
         support mass.
 ```
+
+## Round 89 - pair-counting interval envelope
+
+Controller status:
+
+Round89 adds the pair-level interval envelope layer beneath the Round88
+filtered-cover termwise input.  The change is additive and does not touch
+headline files.
+
+The controller spawned three no-edit scouts.  `termwise_bridge_scout` returned
+only an acknowledgement and no useful technical report.  `pair_remainder_scout`
+did not report by the checkpoint and was closed after the main proof and
+verification no longer depended on it.  `interval_count_scout` produced a
+useful report, but also spawned child scouts despite the explicit no-child
+instruction; this is recorded as coordination drift, not mathematical input to
+the checked Lean file.
+
+The useful scout findings were:
+
+```text
+PathC_GoldbachPairCRTCount.goldbachPairCRTCount_holds
+PathC_PairedCRTSplitByGCD.goldbachPairCount_split_zero_of_not_dvd
+PathC_PairedCRTSplitByGCD.goldbachPairCount_split_eq_div_of_dvd
+PathCResidueRemainderCompatibleSupport.residuePairCountingRemainder_eq_zero_of_not_gcd_dvd
+Mathlib residue-counting tools:
+  Nat.count_modEq_card
+  Nat.Ioc_filter_dvd_card_eq_div
+  Nat.modEq_iff_dvd'
+  Nat.modEq_zero_iff_dvd
+```
+
+Those support the next sharper CRT route, but the current round keeps the
+proved artifact narrower: a public D-level envelope plus a safe `2n` baseline.
+
+Score decision:
+
+```text
+Candidate: D-level pair-counting interval envelope
+  FinalChainImpact      5
+  ResidualReduction     4
+  VerificationGain      5
+  DecompositionQuality  5
+  ReuseValue            5
+  FalsePropRisk         1
+  IntegrationRisk       1
+  ScopeDriftRisk        0
+  ExpectedDelta         54
+  Decision              executed
+
+Candidate: report crude `2n` bound as filtered-cover tail closure
+  FinalChainImpact      7
+  ResidualReduction     2
+  VerificationGain      2
+  DecompositionQuality  1
+  ReuseValue            2
+  FalsePropRisk         4
+  IntegrationRisk       6
+  ScopeDriftRisk        0
+  ExpectedDelta         19
+  Decision              rejected; `2n` is only a pair-level baseline and does
+                        not control the absolute filtered-cover support mass
+```
+
+The new file
+`Gdbh/PathC_ResiduePairCountingIntervalEnvelope.lean`, imported from
+`Gdbh.lean`, introduces:
+
+```text
+residuePairDivisorCountingRemainder
+ResiduePairDivisorIntervalEnvelopeAfter
+ResiduePairDivisorSharpIntervalEnvelope
+```
+
+The D-level form removes the filtered-cover support data from the statement:
+it quantifies only over positive divisors `D1` and `D2`.  The file proves
+public positivity bridges from the residue-prime witness families:
+
+```text
+residueDivisorProd_pos_of_mem_residuePowerset
+residueDivisorProd_pos_of_mem_witnessFamily
+```
+
+It also exposes the already-safe crude baseline:
+
+```text
+filtered_interval_card_le_n
+residuePairQuotientMainTerm_nonneg_le_n
+residuePairDivisorCountingRemainder_abs_le_two_n_of_pos
+residuePairCountingRemainder_abs_le_two_n_of_mem_family
+residuePairDivisorIntervalEnvelopeAfter_two_n
+residueSharedPrimeWitnessFilteredCoverPairRemainderEnvelopeAfter_two_n
+```
+
+and the intended sharper CRT handoff:
+
+```text
+ResiduePairDivisorSharpIntervalEnvelope B
+residuePairDivisorIntervalEnvelopeAfter_of_sharp
+residueSharedPrimeWitnessFilteredCoverPairRemainderEnvelopeAfter_of_divisorIntervalEnvelope
+```
+
+This round deliberately does not claim the filtered-cover log-squared tail.
+The closed `2n` baseline is too large for that purpose.  The remaining
+score-positive pair-level task is to prove the sharper O(1) CRT interval
+discrepancy, likely with `B = 2`, using the mathlib interval residue-counting
+lemmas in `Mathlib.Data.Int.CardIntervalMod`:
+
+```text
+Nat.Ico_filter_modEq_card
+Nat.Ioc_filter_modEq_card
+Nat.count_modEq_card
+```
+
+Verification for Round 89 passed:
+
+* `lake env lean Gdbh/PathC_ResiduePairCountingIntervalEnvelope.lean`
+* `lake build`
+* `python3 audit_lean_source.py`
+* `bash scripts/audit_full.sh`
+* `python3 scripts/regenerate_agents_md.py`
+
+The targeted check and full build printed allowed axiom sets for the new
+public theorem dependencies.  The source audit scanned 287 Lean files with no
+banned project assumptions or placeholders.  The full audit reported 286 Lean
+files under `Gdbh/`, 238,263 lines, 7,498 theorem/lemma declarations, 3,119
+definitions, zero genuine `sorry` or `admit`, zero axiom declarations, and
+both headline theorems with exactly `[propext, Classical.choice, Quot.sound]`.
+
+`AGENTS.md` was regenerated and `Agent.md` was synced to the same content.
+
+Next score-positive candidate:
+
+```text
+Candidate: sharp pair-counting CRT discrepancy
+  Goal: prove `ResiduePairDivisorSharpIntervalEnvelope 2`, or decompose it
+        into a compatibility split plus a single-residue count modulo
+        `Nat.lcm D1 D2`.
+  ExpectedDelta: about 36-44
+  Risk: moderate; existing coprime CRT helpers are private and the general
+        non-coprime branch needs careful compatibility handling.
+```

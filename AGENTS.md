@@ -1,7 +1,7 @@
 # AGENTS.md — Binary Goldbach Lean Formalization
 
 <!-- AUTO:HEADER -->
-_Last auto-regenerated: **2026-05-28 17:56Z** by `scripts/regenerate_agents_md.py`. Manual edits to AUTO sections will be overwritten — edit prose outside the markers._
+_Last auto-regenerated: **2026-05-28 18:19Z** by `scripts/regenerate_agents_md.py`. Manual edits to AUTO sections will be overwritten — edit prose outside the markers._
 <!-- /AUTO:HEADER -->
 
 Lean 4 + mathlib v4.29.1 attempt at unconditional Binary Goldbach. Two parallel attack paths, both axiom-clean at the headline. **Read this before touching any Lean file. Honesty > progress.**
@@ -11,8 +11,8 @@ Lean 4 + mathlib v4.29.1 attempt at unconditional Binary Goldbach. Two parallel 
 ## Project stats
 
 <!-- AUTO:STATS -->
-- `.lean` files under `Gdbh/`: **285**
-- Total lines (incl. comments / blank): **238,032**
+- `.lean` files under `Gdbh/`: **286**
+- Total lines (incl. comments / blank): **238,263**
 <!-- /AUTO:STATS -->
 
 ## Headlines (axiom-clean as of Phase 30)

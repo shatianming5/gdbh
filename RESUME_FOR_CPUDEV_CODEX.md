@@ -32,6 +32,7 @@ Generated from local workspace `/Users/tommy/Downloads/gdbh`.
 17. `Gdbh/PathC_ResidueRemainderWitnessCoverFilteredThresholdSplit.lean`
 18. `Gdbh/PathC_ResidueRemainderWitnessCoverFilteredTailDecomposition.lean`
 19. `Gdbh/PathC_ResidueRemainderWitnessCoverFilteredTermwise.lean`
+20. `Gdbh/PathC_ResiduePairCountingIntervalEnvelope.lean`
 
 ## Active Goal
 
@@ -74,7 +75,7 @@ Use targeted `#print axioms` probes for individual theorems. Do not run
 
 ## Current Verified State
 
-Latest verified mathematical round in the scoreboard is Round 88.
+Latest verified mathematical round in the scoreboard is Round 89.
 
 Round 75 added the coprime/non-coprime compatible-remainder split:
 
@@ -716,6 +717,55 @@ lines, 7,487 theorem/lemma declarations, 3,116 definitions, zero genuine `sorry`
 or `admit`, zero axiom declarations, and both headline theorems exactly
 `[propext, Classical.choice, Quot.sound]`.
 
+Round 89 added the D-level pair-counting interval envelope:
+
+- `Gdbh/PathC_ResiduePairCountingIntervalEnvelope.lean`
+- import in `Gdbh.lean`
+- D-level interfaces:
+
+```text
+residuePairDivisorCountingRemainder
+ResiduePairDivisorIntervalEnvelopeAfter
+ResiduePairDivisorSharpIntervalEnvelope
+```
+
+Public support/product facts:
+
+```text
+residueDivisorProd_pos_of_mem_residuePowerset
+residueDivisorProd_pos_of_mem_witnessFamily
+```
+
+Crude but closed baseline:
+
+```text
+residuePairDivisorCountingRemainder_abs_le_two_n_of_pos
+residuePairCountingRemainder_abs_le_two_n_of_mem_family
+residuePairDivisorIntervalEnvelopeAfter_two_n
+residueSharedPrimeWitnessFilteredCoverPairRemainderEnvelopeAfter_two_n
+```
+
+Bridge for the sharper future CRT residual:
+
+```text
+residuePairDivisorIntervalEnvelopeAfter_of_sharp
+residueSharedPrimeWitnessFilteredCoverPairRemainderEnvelopeAfter_of_divisorIntervalEnvelope
+```
+
+Round 89 verification passed:
+
+- `lake env lean Gdbh/PathC_ResiduePairCountingIntervalEnvelope.lean`
+- `lake build`
+- `python3 audit_lean_source.py`
+- `bash scripts/audit_full.sh`
+- `python3 scripts/regenerate_agents_md.py`
+
+The source audit scanned 287 Lean files with no banned project assumptions or
+placeholders.  The full audit reported 286 Lean files under `Gdbh/`, 238,263
+lines, 7,498 theorem/lemma declarations, 3,119 definitions, zero genuine `sorry`
+or `admit`, zero axiom declarations, and both headline theorems exactly
+`[propext, Classical.choice, Quot.sound]`.
+
 ## Most Recent Non-Math Work
 
 The repository was initialized locally, pushed to GitHub, and then updated
@@ -731,49 +781,48 @@ regeneration.
 
 ## Suggested Next Round
 
-Continue with Round 89.
+Continue with Round 90.
 
 Primary candidate:
 
 ```text
-Candidate: raw pair-counting quotient interval envelope
-  Goal: close a small uniform envelope for
-        residuePairCountingRemainder n d1 d2 by reducing the divisibility
-        conditions to one residue class modulo `Nat.lcm (d1.prod id)
-        (d2.prod id)` and bounding interval-count minus `n / lcm` by an
-        absolute scalar.
-  ExpectedDelta: about 34-40
-  Risk: low-to-moderate; the pair-level bound is arithmetic and safe, but it
-        must not be misreported as closing the absolute filtered-cover
-        support mass.
+Candidate: sharp pair-counting CRT discrepancy
+  Goal: prove `ResiduePairDivisorSharpIntervalEnvelope 2`, or decompose it
+        into compatibility split plus one residue-class count modulo
+        `Nat.lcm D1 D2`.
+  ExpectedDelta: about 36-44
+  Risk: moderate; existing coprime CRT helpers are private and the general
+        non-coprime branch needs careful compatibility handling.
 ```
 
 Reason:
 
-Round88 decomposed the Round87 uniform shared-prime remainder input:
+Round89 exposed the D-level pair-counting envelope and closed a safe `2n`
+baseline:
 
 ```text
-raw pair-counting remainder envelope
-  + closed filtered support fact
+ResiduePairDivisorSharpIntervalEnvelope B
   =>
-ResidueSharedPrimeWitnessFilteredCoverUniformRemainderAfter
+ResiduePairDivisorIntervalEnvelopeAfter N (fun _ => B)
+  =>
+ResidueSharedPrimeWitnessFilteredCoverPairRemainderEnvelopeAfter
 ```
 
-The next useful step is to close or further decompose the raw pair-counting
-envelope.  This is an arithmetic interval-counting task and should stay
-separate from the still-open absolute filtered-cover support-mass estimate.
+The next useful step is to replace the `2n` baseline by an O(1) CRT
+discrepancy.  This remains pair-level only and should stay separate from the
+still-open absolute filtered-cover support-mass estimate.
 
 Possible additive file:
 
 ```text
-Gdbh/PathC_ResiduePairCountingIntervalEnvelope.lean
+Gdbh/PathC_ResiduePairCountingSharpCRT.lean
 ```
 
 Possible public theorems:
 
 ```text
-residuePairCountingRemainder_abs_le_intervalEnvelope
-residueSharedPrimeWitnessFilteredCoverPairRemainderEnvelopeAfter_of_intervalEnvelope
+ResiduePairDivisorSharpIntervalEnvelopeTwo
+residuePairDivisorSharpIntervalEnvelope_two
 ```
 
 Secondary candidate:
@@ -803,4 +852,4 @@ sed -n '1,140p' AGENTS.md
 tail -n 260 pathc_master_scoreboard.md
 ```
 
-Then start Round 89 with the master-controller workflow above.
+Then start Round 90 with the master-controller workflow above.
