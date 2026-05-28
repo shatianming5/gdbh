@@ -28,6 +28,10 @@ Generated from local workspace `/Users/tommy/Downloads/gdbh`.
 13. `Gdbh/PathC_ResidueRemainderWitnessCoverFiltered.lean`
 14. `Gdbh/PathC_ResidueRemainderWitnessCoverFilteredEnvelope.lean`
 15. `Gdbh/PathC_ResidueRemainderWitnessCoverFilteredEnvelopeApplications.lean`
+16. `Gdbh/PathC_ResidueRemainderWitnessCoverFilteredFinitePrefix.lean`
+17. `Gdbh/PathC_ResidueRemainderWitnessCoverFilteredThresholdSplit.lean`
+18. `Gdbh/PathC_ResidueRemainderWitnessCoverFilteredTailDecomposition.lean`
+19. `Gdbh/PathC_ResidueRemainderWitnessCoverFilteredTermwise.lean`
 
 ## Active Goal
 
@@ -70,7 +74,7 @@ Use targeted `#print axioms` probes for individual theorems. Do not run
 
 ## Current Verified State
 
-Latest verified mathematical round in the scoreboard is Round 84.
+Latest verified mathematical round in the scoreboard is Round 88.
 
 Round 75 added the coprime/non-coprime compatible-remainder split:
 
@@ -660,6 +664,58 @@ lines, 7,480 theorem/lemma declarations, 3,113 definitions, zero genuine `sorry`
 or `admit`, zero axiom declarations, and both headline theorems exactly
 `[propext, Classical.choice, Quot.sound]`.
 
+Round 88 added the termwise shared-prime remainder split:
+
+- `Gdbh/PathC_ResidueRemainderWitnessCoverFilteredTermwise.lean`
+- import in `Gdbh.lean`
+- termwise inputs:
+
+```text
+ResidueSharedPrimeWitnessFilteredCoverPairRemainderEnvelopeAfter
+ResidueSharedPrimeWitnessFilteredCoverSharedPrimeSupportAfter
+ResidueSharedPrimeWitnessFilteredCoverTermwiseDecompositionAfter
+```
+
+Closed support facts:
+
+```text
+residueWitnessContainingDivisorFamily_mem_inter
+residueSharedPrimeWitnessFilteredCoverSharedPrimeSupportAfter_holds
+```
+
+Public bridges:
+
+```text
+residueSharedPrimeIntersectionPairCountingRemainder_abs_le_pairRemainder_of_nonneg
+residueSharedPrimeIntersectionPairCountingRemainder_abs_le_pairRemainder_of_support
+residueSharedPrimeWitnessFilteredCoverUniformRemainderAfter_of_pairRemainderEnvelope
+residueSharedPrimeWitnessFilteredCoverUniformRemainderAfter_of_termwiseDecomposition
+residueSharedPrimeWitnessFilteredCoverTermwiseDecompositionAfter_of_pairRemainderEnvelope
+```
+
+Meaning:
+
+```text
+raw pair-counting remainder envelope
+  + closed filtered support fact
+  =>
+ResidueSharedPrimeWitnessFilteredCoverUniformRemainderAfter
+```
+
+Round 88 verification passed:
+
+- `lake env lean Gdbh/PathC_ResidueRemainderWitnessCoverFilteredTermwise.lean`
+- `lake build`
+- `python3 audit_lean_source.py`
+- `bash scripts/audit_full.sh`
+- `python3 scripts/regenerate_agents_md.py`
+
+The source audit scanned 286 Lean files with no banned project assumptions or
+placeholders.  The full audit reported 285 Lean files under `Gdbh/`, 238,032
+lines, 7,487 theorem/lemma declarations, 3,116 definitions, zero genuine `sorry`
+or `admit`, zero axiom declarations, and both headline theorems exactly
+`[propext, Classical.choice, Quot.sound]`.
+
 ## Most Recent Non-Math Work
 
 The repository was initialized locally, pushed to GitHub, and then updated
@@ -675,47 +731,49 @@ regeneration.
 
 ## Suggested Next Round
 
-Continue with Round 88.
+Continue with Round 89.
 
 Primary candidate:
 
 ```text
-Candidate: termwise shared-prime remainder envelope
-  Goal: split
-        ResidueSharedPrimeWitnessFilteredCoverUniformRemainderAfter
-        into a quotient-remainder bound and a shared-prime divisibility
-        support condition, reusing existing `residuePairCountingRemainder`
-        interfaces where possible.
-  ExpectedDelta: about 30-34
-  Risk: moderate; must avoid turning the trivial `2n` pointwise bound into
-        a false log-squared tail claim
+Candidate: raw pair-counting quotient interval envelope
+  Goal: close a small uniform envelope for
+        residuePairCountingRemainder n d1 d2 by reducing the divisibility
+        conditions to one residue class modulo `Nat.lcm (d1.prod id)
+        (d2.prod id)` and bounding interval-count minus `n / lcm` by an
+        absolute scalar.
+  ExpectedDelta: about 34-40
+  Risk: low-to-moderate; the pair-level bound is arithmetic and safe, but it
+        must not be misreported as closing the absolute filtered-cover
+        support mass.
 ```
 
 Reason:
 
-Round87 decomposed the filtered-cover tail:
+Round88 decomposed the Round87 uniform shared-prime remainder input:
 
 ```text
-uniform termwise remainder envelope
-  + weighted/cardinality tail estimates
+raw pair-counting remainder envelope
+  + closed filtered support fact
   =>
-filtered-cover tail worker
+ResidueSharedPrimeWitnessFilteredCoverUniformRemainderAfter
 ```
 
-The next useful step is to decompose the uniform termwise remainder envelope,
-separating raw quotient-counting error from shared-prime support conditions.
+The next useful step is to close or further decompose the raw pair-counting
+envelope.  This is an arithmetic interval-counting task and should stay
+separate from the still-open absolute filtered-cover support-mass estimate.
 
 Possible additive file:
 
 ```text
-Gdbh/PathC_ResidueRemainderWitnessCoverFilteredTermwise.lean
+Gdbh/PathC_ResiduePairCountingIntervalEnvelope.lean
 ```
 
 Possible public theorems:
 
 ```text
-ResidueSharedPrimeWitnessFilteredCoverPairRemainderEnvelopeAfter
-ResidueSharedPrimeWitnessFilteredCoverSharedPrimeSupportAfter
+residuePairCountingRemainder_abs_le_intervalEnvelope
+residueSharedPrimeWitnessFilteredCoverPairRemainderEnvelopeAfter_of_intervalEnvelope
 ```
 
 Secondary candidate:
@@ -745,4 +803,4 @@ sed -n '1,140p' AGENTS.md
 tail -n 260 pathc_master_scoreboard.md
 ```
 
-Then start Round 88 with the master-controller workflow above.
+Then start Round 89 with the master-controller workflow above.
