@@ -1,0 +1,52 @@
+{
+  "kind": "vonMangoldt_dft_model_l2_minor_quarter_linear_error_canonical_weight_sum_estimate",
+  "version": 1,
+  "status": "template",
+  "lean_object": "Gdbh.DiscreteCircleMethod.VonMangoldtDftModelL2MinorQuarterLinearErrorCanonicalWeightSumEstimate",
+  "imports": ["Gdbh.VonMangoldtGoldbach", "Gdbh.DiscreteCircleMethod"],
+  "finite_certificate_bound": 100,
+  "finiteCertificateTheorem": "Gdbh.goldbachUpTo100",
+  "majorArcThreshold": 100,
+  "minorArcThreshold": 100,
+  "totalLinearErrorThreshold": 100,
+  "relativeError": "1/2",
+  "analyticErrorCoefficient": "1/8",
+  "majorArcs": "majorArcs",
+  "majorArcModelTerm": "majorArcModelTerm",
+  "majorArcTermError": "majorArcTermError",
+  "majorArcModelError": "majorArcModelError",
+  "majorArcError": "majorArcError",
+  "minorArcDftBound": "minorArcDftBound",
+  "minorArcError": "minorArcError",
+  "obligations": {
+    "major_arc_term_approximation_bound": {
+      "status": "paper",
+      "statement": "for all even n > majorArcThreshold and k in majorArcs(n), |rawVonMangoldtDftSquareFourierTerm(n,k) - majorArcModelTerm(n,k)| <= majorArcTermError(n,k)"
+    },
+    "major_arc_model_approximation_bound": {
+      "status": "paper",
+      "statement": "for all even n > majorArcThreshold, |sum_{k in majorArcs(n)} majorArcModelTerm(n,k) - goldbachSingularSeriesFromQuarter(n) * n| <= majorArcModelError(n)"
+    },
+    "major_arc_error_bound": {
+      "status": "paper",
+      "statement": "for all even n > majorArcThreshold, sum_{k in majorArcs(n)} majorArcTermError(n,k) + majorArcModelError(n) <= majorArcError(n)"
+    },
+    "minor_arc_dft_bound_valid": {
+      "status": "paper",
+      "statement": "for all even n > minorArcThreshold and k outside majorArcs(n), |vonMangoldtZModDft(n,k)| <= minorArcDftBound(n,k)"
+    },
+    "minor_arc_square_sum_bound": {
+      "status": "paper",
+      "statement": "for all even n > minorArcThreshold, |(n+1)^-1| * sum_{k outside majorArcs(n)} minorArcDftBound(n,k)^2 <= minorArcError(n)"
+    },
+    "total_linear_error_bound": {
+      "status": "paper",
+      "statement": "for all even n > totalLinearErrorThreshold, majorArcError(n) + minorArcError(n) <= analyticErrorCoefficient * n"
+    }
+  },
+  "canonicalContaminationThresholdBound": {
+    "status": "missing",
+    "statement": "estimate.canonicalContaminationThreshold <= finite_certificate_bound"
+  },
+  "notes": "Template only. This is the DFT-level L2 minor-arc certificate for the current closest circle-method handoff. The analytic side must provide termwise major-frequency DFT-square approximations, a model-sum approximation to goldbachSingularSeriesFromQuarter(n) * n, a major-error summation bound, frequency-dependent minor DFT bounds, the corresponding L2 square-sum minor bound, a total linear error bound, and final canonical contamination threshold coverage."
+}

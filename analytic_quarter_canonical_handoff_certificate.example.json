@@ -1,0 +1,24 @@
+{
+  "kind": "vonMangoldt_quarter_hardy_littlewood_normalized_canonical_weight_sum_estimate",
+  "version": 1,
+  "status": "template",
+  "lean_object": "Gdbh.VonMangoldtQuarterHardyLittlewoodNormalizedCanonicalWeightSumEstimate",
+  "imports": ["Gdbh.VonMangoldtGoldbach"],
+  "finite_certificate_bound": 100,
+  "finiteCertificateTheorem": "Gdbh.goldbachUpTo100",
+  "threshold": 100,
+  "relativeError": "1/2",
+  "obligations": {
+    "raw_normalized_error_bound": {
+      "status": "missing",
+      "statement": "for all even n > threshold, |((RawVonMangoldtGoldbachSum(n) - goldbachSingularSeriesFromQuarter(n) * n) / (goldbachSingularSeriesFromQuarter(n) * n))| <= relativeError",
+      "lean_declaration": ""
+    }
+  },
+  "canonicalContaminationThresholdBound": {
+    "status": "missing",
+    "statement": "estimate.canonicalContaminationThreshold <= finite_certificate_bound",
+    "lean_term": ""
+  },
+  "notes": "Template only. This is the narrow quarter-base canonical HL certificate. Lean fixes the singular-series field to goldbachSingularSeriesFromQuarter, fixes the lower coefficient to 1/4, and supplies the singular-series lower bound internally. The remaining analytic obligation is the pointwise normalized raw von Mangoldt error, plus final canonical contamination threshold coverage."
+}

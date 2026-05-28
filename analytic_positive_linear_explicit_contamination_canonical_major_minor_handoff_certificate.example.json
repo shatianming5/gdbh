@@ -1,0 +1,34 @@
+{
+  "kind": "vonMangoldt_split_threshold_positive_linear_explicit_contamination_canonical_weight_sum_major_minor_arc_estimate",
+  "version": 1,
+  "status": "template",
+  "lean_object": "Gdbh.VonMangoldtSplitThresholdPositiveLinearExplicitContaminationCanonicalWeightSumMajorMinorArcEstimate",
+  "imports": ["Gdbh.VonMangoldtGoldbach"],
+  "finite_certificate_bound": 100,
+  "finiteCertificateTheorem": "Gdbh.goldbachUpTo100",
+  "combinedThreshold": 100,
+  "linearNetThreshold": 100,
+  "contaminationThreshold": 100,
+  "coefficient": "1/8",
+  "mainTerm": "exampleMajorMinorMainTerm",
+  "majorArcError": "exampleMajorArcError",
+  "minorArcError": "exampleMinorArcError",
+  "obligations": {
+    "combined_lower_bound": {
+      "status": "missing",
+      "statement": "for all even n > combinedThreshold, mainTerm(n) - majorArcError(n) <= RawVonMangoldtGoldbachSum(n) + minorArcError(n)",
+      "lean_declaration": ""
+    },
+    "linear_net_lower_bound": {
+      "status": "missing",
+      "statement": "for all even n > linearNetThreshold, coefficient * n + minorArcError(n) <= mainTerm(n) - majorArcError(n)",
+      "lean_declaration": ""
+    },
+    "contamination_dominated": {
+      "status": "missing",
+      "statement": "for all even n > contaminationThreshold, 2 * vonMangoldtWeightSumContaminationBudget(canonicalNonPrimePrimePowerVonMangoldtWeightSumBound, n) < coefficient * n",
+      "lean_declaration": ""
+    }
+  },
+  "notes": "Template only. This is the split-threshold positive-linear major/minor route with canonical weight-sum control but an explicit contamination threshold. The analytic side supplies the two major/minor inequalities plus the explicit domination of the canonical contamination budget. Lean then derives the final direct raw weight-sum threshold from the three numeric component thresholds, avoiding any need to bound the noncomputable canonicalLinearContaminationThreshold."
+}

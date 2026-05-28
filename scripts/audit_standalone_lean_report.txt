@@ -1,0 +1,13 @@
+Standalone Lean audit
+Repository: /Users/tommy/Downloads/gdbh
+Mode:       orphans
+Timeout:    120s per file
+Report:     /Users/tommy/Downloads/gdbh/scripts/audit_standalone_lean_report.txt
+
+Targets:    5
+
+Gdbh.PathC_AtSqrtToUniversalClosure  Gdbh/PathC_AtSqrtToUniversalClosure.lean
+Gdbh.PathC_BrunPiKBound  Gdbh/PathC_BrunPiKBound.lean
+Gdbh.PathC_FactorialStirling  Gdbh/PathC_FactorialStirling.lean
+Gdbh.PathC_WeightedSchnirelmannClosure  Gdbh/PathC_WeightedSchnirelmannClosure.lean
+Gdbh.PathC_WeightedSchnirelmannSafeClosure  Gdbh/PathC_WeightedSchnirelmannSafeClosure.lean

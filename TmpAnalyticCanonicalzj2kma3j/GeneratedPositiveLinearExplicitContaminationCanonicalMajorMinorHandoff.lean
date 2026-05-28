@@ -1,0 +1,54 @@
+import Gdbh.VonMangoldtGoldbach
+import TmpAnalyticCanonicalzj2kma3j.AnalyticMock
+
+namespace Gdbh
+
+noncomputable def examplePositiveLinearExplicitContaminationCanonicalMajorMinorHandoff :
+    VonMangoldtSplitThresholdPositiveLinearExplicitContaminationCanonicalWeightSumMajorMinorArcEstimate where
+  combinedThreshold := 100
+  linearNetThreshold := 100
+  contaminationThreshold := 100
+  coefficient := ((1 / 8) : ℝ)
+  coefficient_pos := by norm_num
+  mainTerm := exampleMajorMinorMainTerm
+  majorArcError := exampleMajorArcError
+  minorArcError := exampleMinorArcError
+  combinedLowerBound := Gdbh.example_positive_linear_explicit_contamination_canonical_major_minor_combined_lower_bound
+  linearNetLowerBound := Gdbh.example_positive_linear_explicit_contamination_canonical_major_minor_linear_net_lower_bound
+  contaminationDominated := Gdbh.example_positive_linear_explicit_contamination_canonical_major_minor_contamination_dominated
+
+theorem strongGoldbach_from_examplePositiveLinearExplicitContaminationCanonicalMajorMinorHandoff_and_finite_certificate
+    (finite : GoldbachUpTo 100)
+    (hthreshold :
+      examplePositiveLinearExplicitContaminationCanonicalMajorMinorHandoff.toDirectRawWeightSumLowerBound.threshold ≤
+        100) :
+    StrongGoldbach :=
+  strongGoldbach_of_finite_and_vonMangoldt_split_threshold_positive_linear_explicit_contamination_canonical_weight_sum_major_minor_arc_estimate_le
+    finite examplePositiveLinearExplicitContaminationCanonicalMajorMinorHandoff hthreshold
+
+theorem strongGoldbach_from_examplePositiveLinearExplicitContaminationCanonicalMajorMinorHandoff_and_finite_certificate_closed
+    (finite : GoldbachUpTo 100) :
+    StrongGoldbach :=
+  strongGoldbach_of_finite_and_vonMangoldt_split_threshold_positive_linear_explicit_contamination_canonical_weight_sum_major_minor_arc_estimate_le
+    finite examplePositiveLinearExplicitContaminationCanonicalMajorMinorHandoff
+    (examplePositiveLinearExplicitContaminationCanonicalMajorMinorHandoff.directRawWeightSumThreshold_le_of_components
+      (by norm_num [examplePositiveLinearExplicitContaminationCanonicalMajorMinorHandoff])
+      (by norm_num [examplePositiveLinearExplicitContaminationCanonicalMajorMinorHandoff])
+      (by norm_num [examplePositiveLinearExplicitContaminationCanonicalMajorMinorHandoff]))
+
+theorem strongGoldbach_from_examplePositiveLinearExplicitContaminationCanonicalMajorMinorHandoff :
+    StrongGoldbach :=
+  strongGoldbach_from_examplePositiveLinearExplicitContaminationCanonicalMajorMinorHandoff_and_finite_certificate_closed
+    Gdbh.goldbachUpTo100
+
+theorem explicitLowerBound_from_examplePositiveLinearExplicitContaminationCanonicalMajorMinorHandoff :
+    ExplicitGoldbachLowerBound
+      examplePositiveLinearExplicitContaminationCanonicalMajorMinorHandoff.toDirectRawWeightSumLowerBound.threshold :=
+  explicit_lower_bound_of_vonMangoldt_split_threshold_positive_linear_explicit_contamination_canonical_weight_sum_major_minor_arc_estimate
+    examplePositiveLinearExplicitContaminationCanonicalMajorMinorHandoff
+
+theorem explicitLowerBound100_from_examplePositiveLinearExplicitContaminationCanonicalMajorMinorHandoff :
+    ExplicitGoldbachLowerBound 100 :=
+  strongGoldbach_iff_explicit_lower_bound100.mp
+    strongGoldbach_from_examplePositiveLinearExplicitContaminationCanonicalMajorMinorHandoff
+end Gdbh

@@ -1,0 +1,9 @@
+{
+  "bound": 100,
+  "certificate": "Gdbh/Certificate100.lean",
+  "generator": "verify_goldbach.py",
+  "generator_command": "python3 verify_goldbach.py 100 --export-lean Gdbh/Certificate100.lean --export-manifest certificate_manifest.json",
+  "lean_theorem": "Gdbh.goldbachUpTo100",
+  "sha256": "bf18d28770b7ce0ef03189aeb64038683ff5865672dc432bab72fb43190a3f3f",
+  "notes": "Finite Lean-checked certificate only; this does not prove the strong Goldbach conjecture."
+}

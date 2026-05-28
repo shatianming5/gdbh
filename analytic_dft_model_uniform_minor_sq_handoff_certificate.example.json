@@ -1,0 +1,55 @@
+{
+  "kind": "vonMangoldt_dft_model_uniform_minor_sq_quarter_linear_error_canonical_weight_sum_estimate",
+  "version": 1,
+  "status": "template",
+  "lean_object": "Gdbh.DiscreteCircleMethod.VonMangoldtDftModelUniformMinorSqQuarterLinearErrorCanonicalWeightSumEstimate",
+  "imports": [
+    "Gdbh.VonMangoldtGoldbach",
+    "Gdbh.DiscreteCircleMethod"
+  ],
+  "finite_certificate_bound": 100,
+  "finiteCertificateTheorem": "Gdbh.goldbachUpTo100",
+  "majorArcThreshold": 100,
+  "minorArcThreshold": 100,
+  "totalLinearErrorThreshold": 100,
+  "relativeError": "1/2",
+  "analyticErrorCoefficient": "1/8",
+  "majorArcs": "analyticMajorArcs",
+  "majorArcModelTerm": "analyticMajorArcModelTerm",
+  "majorArcTermError": "analyticMajorArcTermError",
+  "majorArcModelError": "analyticMajorArcModelError",
+  "majorArcError": "analyticMajorArcError",
+  "minorArcDftBound": "analyticMinorArcDftBound",
+  "minorArcError": "analyticMinorArcError",
+  "obligations": {
+    "major_arc_term_approximation_bound": {
+      "status": "missing",
+      "statement": "for all even n > majorArcThreshold and k in majorArcs(n), |rawVonMangoldtDftSquareFourierTerm(n,k) - majorArcModelTerm(n,k)| <= majorArcTermError(n,k)"
+    },
+    "major_arc_model_approximation_bound": {
+      "status": "missing",
+      "statement": "for all even n > majorArcThreshold, |sum_{k in majorArcs(n)} majorArcModelTerm(n,k) - goldbachSingularSeriesFromQuarter(n) * n| <= majorArcModelError(n)"
+    },
+    "major_arc_error_bound": {
+      "status": "missing",
+      "statement": "for all even n > majorArcThreshold, sum_{k in majorArcs(n)} majorArcTermError(n,k) + majorArcModelError(n) <= majorArcError(n)"
+    },
+    "minor_arc_uniform_dft_bound_valid": {
+      "status": "missing",
+      "statement": "for all even n > minorArcThreshold and k outside majorArcs(n), |vonMangoldtZModDft(n,k)| <= minorArcDftBound(n)"
+    },
+    "minor_arc_dft_bound_sq_error_bound": {
+      "status": "missing",
+      "statement": "for all even n > minorArcThreshold, minorArcDftBound(n)^2 <= minorArcError(n)"
+    },
+    "total_linear_error_bound": {
+      "status": "missing",
+      "statement": "for all even n > totalLinearErrorThreshold, majorArcError(n) + minorArcError(n) <= analyticErrorCoefficient * n"
+    }
+  },
+  "canonicalContaminationThresholdBound": {
+    "status": "missing",
+    "statement": "estimate.canonicalContaminationThreshold <= finite_certificate_bound"
+  },
+  "notes": "Template only. This is the coarsest current DFT/minor-arc handoff: Lean uses the trivial minor-frequency count bound and the squared uniform-bound bridge, so the analytic side only supplies a uniform minor DFT bound and the square-error domination M(n)^2 <= minorArcError(n), plus major model and total linear error bounds. No separate nonnegativity declaration for M(n) is required."
+}

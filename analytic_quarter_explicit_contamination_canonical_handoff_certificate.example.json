@@ -1,0 +1,25 @@
+{
+  "kind": "vonMangoldt_quarter_hardy_littlewood_normalized_explicit_contamination_canonical_weight_sum_estimate",
+  "version": 1,
+  "status": "template",
+  "lean_object": "Gdbh.VonMangoldtQuarterHardyLittlewoodNormalizedExplicitContaminationCanonicalWeightSumEstimate",
+  "imports": ["Gdbh.VonMangoldtGoldbach"],
+  "finite_certificate_bound": 100,
+  "finiteCertificateTheorem": "Gdbh.goldbachUpTo100",
+  "threshold": 100,
+  "contaminationThreshold": 100,
+  "relativeError": "1/2",
+  "obligations": {
+    "raw_normalized_error_bound": {
+      "status": "missing",
+      "statement": "for all even n > threshold, |((RawVonMangoldtGoldbachSum(n) - goldbachSingularSeriesFromQuarter(n) * n) / (goldbachSingularSeriesFromQuarter(n) * n))| <= relativeError",
+      "lean_declaration": ""
+    },
+    "contamination_dominated": {
+      "status": "missing",
+      "statement": "for all even n > contaminationThreshold, 2 * vonMangoldtWeightSumContaminationBudget(canonicalNonPrimePrimePowerVonMangoldtWeightSumBound, n) < (1 - relativeError) * (1/4) * n",
+      "lean_declaration": ""
+    }
+  },
+  "notes": "Template only. This route fixes goldbachSingularSeriesFromQuarter and coefficient 1/4 in Lean, asks the analytic side for the pointwise normalized raw von Mangoldt estimate plus an explicit canonical contamination domination threshold, and avoids bounding the noncomputable canonicalHLContaminationThreshold."
+}

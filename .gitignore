@@ -1,0 +1,22 @@
+.DS_Store
+
+# Lean/lake dependency and build cache. Recreate with `lake update`,
+# `lake exe cache get`, and `lake build`.
+.lake/
+
+# Python caches and local test artifacts.
+__pycache__/
+**/__pycache__/
+.pytest_cache/
+*.py[cod]
+
+# Lean generated artifacts, if produced outside `.lake/`.
+*.olean
+*.ilean
+*.c
+*.o
+
+# Local editor and temporary files.
+*.swp
+*.swo
+*~

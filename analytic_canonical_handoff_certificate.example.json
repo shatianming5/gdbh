@@ -1,0 +1,33 @@
+{
+  "kind": "vonMangoldt_hardy_littlewood_normalized_canonical_weight_sum_estimate",
+  "version": 1,
+  "status": "template",
+  "lean_object": "Gdbh.VonMangoldtHardyLittlewoodNormalizedCanonicalWeightSumEstimate",
+  "imports": [
+    "Gdbh.VonMangoldtGoldbach",
+    "Gdbh.SingularSeries"
+  ],
+  "finite_certificate_bound": 100,
+  "finiteCertificateTheorem": "Gdbh.goldbachUpTo100",
+  "threshold": 100,
+  "coefficient": "1/4",
+  "relativeError": "1/2",
+  "singularSeries": "goldbachSingularSeriesFromQuarter",
+  "obligations": {
+    "singular_series_lower_bound": {
+      "status": "formalized",
+      "statement": "for all even n > threshold, coefficient <= singularSeries(n)",
+      "lean_declaration": "Gdbh.one_fourth_le_goldbachSingularSeriesFromQuarter"
+    },
+    "raw_normalized_error_bound": {
+      "status": "missing",
+      "statement": "for all even n > threshold, |((RawVonMangoldtGoldbachSum(n) - singularSeries(n) * n) / (singularSeries(n) * n))| <= relativeError",
+      "lean_declaration": ""
+    }
+  },
+  "derivedThresholdBound": {
+    "status": "missing",
+    "statement": "estimate.toDirectRawWeightSumLowerBound.threshold <= finite_certificate_bound",
+    "lean_term": ""
+  }
+}

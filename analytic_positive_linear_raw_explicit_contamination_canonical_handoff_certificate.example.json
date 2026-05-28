@@ -1,0 +1,25 @@
+{
+  "kind": "vonMangoldt_positive_linear_raw_explicit_contamination_canonical_weight_sum_lower_bound",
+  "version": 1,
+  "status": "template",
+  "lean_object": "Gdbh.VonMangoldtPositiveLinearRawExplicitContaminationCanonicalWeightSumLowerBound",
+  "imports": ["Gdbh.VonMangoldtGoldbach"],
+  "finite_certificate_bound": 100,
+  "finiteCertificateTheorem": "Gdbh.goldbachUpTo100",
+  "rawThreshold": 100,
+  "contaminationThreshold": 100,
+  "coefficient": "1/8",
+  "obligations": {
+    "raw_linear_lower_bound": {
+      "status": "missing",
+      "statement": "for all even n > rawThreshold, coefficient * n <= RawVonMangoldtGoldbachSum(n)",
+      "lean_declaration": ""
+    },
+    "contamination_dominated": {
+      "status": "missing",
+      "statement": "for all even n > contaminationThreshold, 2 * vonMangoldtWeightSumContaminationBudget(canonicalNonPrimePrimePowerVonMangoldtWeightSumBound, n) < coefficient * n",
+      "lean_declaration": ""
+    }
+  },
+  "notes": "Template only. This is the positive-linear raw route with canonical weight-sum control and an explicit contamination threshold. The analytic side supplies a pointwise positive linear raw von Mangoldt lower bound and an explicit domination of the canonical contamination budget. Lean derives the final direct raw weight-sum threshold from rawThreshold and contaminationThreshold, avoiding any need to bound the noncomputable canonicalLinearContaminationThreshold."
+}

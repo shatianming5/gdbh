@@ -1,0 +1,41 @@
+{
+  "kind": "vonMangoldt_quarter_split_threshold_hardy_littlewood_major_minor_decomposition_canonical_weight_sum_estimate",
+  "version": 1,
+  "status": "template",
+  "lean_object": "Gdbh.VonMangoldtQuarterSplitThresholdHardyLittlewoodMajorMinorDecompositionCanonicalWeightSumEstimate",
+  "imports": ["Gdbh.VonMangoldtGoldbach"],
+  "finite_certificate_bound": 100,
+  "finiteCertificateTheorem": "Gdbh.goldbachUpTo100",
+  "decompositionThreshold": 100,
+  "majorArcThreshold": 100,
+  "minorArcThreshold": 100,
+  "totalAnalyticErrorThreshold": 100,
+  "relativeError": "1/2",
+  "majorArcContribution": "majorArcContribution",
+  "minorArcContribution": "minorArcContribution",
+  "majorArcError": "majorArcError",
+  "minorArcError": "minorArcError",
+  "obligations": {
+    "raw_decomposition": {
+      "status": "paper",
+      "statement": "for all even n > decompositionThreshold, RawVonMangoldtGoldbachSum(n) = majorArcContribution(n) + minorArcContribution(n)"
+    },
+    "major_arc_approximation_bound": {
+      "status": "paper",
+      "statement": "for all even n > majorArcThreshold, |majorArcContribution(n) - goldbachSingularSeriesFromQuarter(n) * n| <= majorArcError(n)"
+    },
+    "minor_arc_contribution_bound": {
+      "status": "paper",
+      "statement": "for all even n > minorArcThreshold, |minorArcContribution(n)| <= minorArcError(n)"
+    },
+    "total_analytic_error_bound": {
+      "status": "paper",
+      "statement": "for all even n > totalAnalyticErrorThreshold, majorArcError(n) + minorArcError(n) <= relativeError * goldbachSingularSeriesFromQuarter(n) * n"
+    }
+  },
+  "canonicalContaminationThresholdBound": {
+    "status": "missing",
+    "statement": "estimate.canonicalContaminationThreshold <= finite_certificate_bound"
+  },
+  "notes": "Template only. This records the narrow quarter-base major/minor decomposition handoff; it still needs formal Lean declarations for the raw decomposition, major arc approximation, minor arc contribution bound, total analytic error domination, and final canonical contamination threshold coverage. The four explicit analytic threshold fields are numeric and are converted by the generated Lean wrapper into the direct raw weight-sum threshold bound."
+}

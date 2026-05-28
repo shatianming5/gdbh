@@ -1,0 +1,39 @@
+{
+  "kind": "vonMangoldt_hardy_littlewood_normalized_weight_sum_estimate",
+  "version": 1,
+  "status": "template",
+  "lean_object": "Gdbh.VonMangoldtHardyLittlewoodNormalizedWeightSumEstimate",
+  "imports": [
+    "Gdbh.VonMangoldtGoldbach",
+    "Gdbh.SingularSeries"
+  ],
+  "finite_certificate_bound": 100,
+  "finiteCertificateTheorem": "Gdbh.goldbachUpTo100",
+  "threshold": 100,
+  "coefficient": "1/4",
+  "relativeError": "1/2",
+  "singularSeries": "goldbachSingularSeriesFromQuarter",
+  "weightSumBound": "canonicalNonPrimePrimePowerVonMangoldtWeightSumBound",
+  "obligations": {
+    "singular_series_lower_bound": {
+      "status": "formalized",
+      "statement": "for all even n > threshold, coefficient <= singularSeries(n)",
+      "lean_declaration": "Gdbh.one_fourth_le_goldbachSingularSeriesFromQuarter"
+    },
+    "raw_normalized_error_bound": {
+      "status": "missing",
+      "statement": "for all even n > threshold, |((RawVonMangoldtGoldbachSum(n) - singularSeries(n) * n) / (singularSeries(n) * n))| <= relativeError",
+      "lean_declaration": ""
+    },
+    "non_prime_prime_power_weight_sum_bound": {
+      "status": "formalized",
+      "statement": "for all even n > threshold, NonPrimePrimePowerVonMangoldtWeightSum(n) <= weightSumBound(n)",
+      "lean_declaration": "Gdbh.canonicalNonPrimePrimePowerVonMangoldtWeightSumBound_valid"
+    },
+    "contamination_dominated": {
+      "status": "missing",
+      "statement": "for all even n > threshold, 2 * weightSumBound(n) * log n < (1 - relativeError) * coefficient * n",
+      "lean_declaration": ""
+    }
+  }
+}

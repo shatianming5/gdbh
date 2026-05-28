@@ -1,0 +1,25 @@
+{
+  "kind": "vonMangoldt_quarter_hardy_littlewood_lower_bound_explicit_contamination_canonical_weight_sum_estimate",
+  "version": 1,
+  "status": "template",
+  "lean_object": "Gdbh.VonMangoldtQuarterHardyLittlewoodLowerBoundExplicitContaminationCanonicalWeightSumEstimate",
+  "imports": ["Gdbh.VonMangoldtGoldbach"],
+  "finite_certificate_bound": 100,
+  "finiteCertificateTheorem": "Gdbh.goldbachUpTo100",
+  "threshold": 100,
+  "contaminationThreshold": 100,
+  "relativeError": "1/2",
+  "obligations": {
+    "raw_relative_lower_bound": {
+      "status": "missing",
+      "statement": "for all even n > threshold, (1 - relativeError) * goldbachSingularSeriesFromQuarter(n) * n <= RawVonMangoldtGoldbachSum(n)",
+      "lean_declaration": ""
+    },
+    "contamination_dominated": {
+      "status": "missing",
+      "statement": "for all even n > contaminationThreshold, 2 * vonMangoldtWeightSumContaminationBudget(canonicalNonPrimePrimePowerVonMangoldtWeightSumBound, n) < (1 - relativeError) * (1/4) * n",
+      "lean_declaration": ""
+    }
+  },
+  "notes": "Template only. This is the narrow one-sided quarter Hardy-Littlewood lower-bound handoff: prove the raw von Mangoldt convolution is at least (1 - relativeError) times the fixed quarter singular-series main term, plus explicit canonical contamination domination. It intentionally does not ask for the upper side of a normalized absolute-error estimate."
+}

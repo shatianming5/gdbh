@@ -1,0 +1,42 @@
+{
+  "kind": "vonMangoldt_quarter_linear_error_decomposition_canonical_weight_sum_estimate",
+  "version": 1,
+  "status": "template",
+  "lean_object": "Gdbh.VonMangoldtQuarterLinearErrorDecompositionCanonicalWeightSumEstimate",
+  "imports": ["Gdbh.VonMangoldtGoldbach"],
+  "finite_certificate_bound": 100,
+  "finiteCertificateTheorem": "Gdbh.goldbachUpTo100",
+  "decompositionThreshold": 100,
+  "majorArcThreshold": 100,
+  "minorArcThreshold": 100,
+  "totalLinearErrorThreshold": 100,
+  "relativeError": "1/2",
+  "analyticErrorCoefficient": "1/8",
+  "majorArcContribution": "majorArcContribution",
+  "minorArcContribution": "minorArcContribution",
+  "majorArcError": "majorArcError",
+  "minorArcError": "minorArcError",
+  "obligations": {
+    "raw_decomposition": {
+      "status": "paper",
+      "statement": "for all even n > decompositionThreshold, RawVonMangoldtGoldbachSum(n) = majorArcContribution(n) + minorArcContribution(n)"
+    },
+    "major_arc_approximation_bound": {
+      "status": "paper",
+      "statement": "for all even n > majorArcThreshold, |majorArcContribution(n) - goldbachSingularSeriesFromQuarter(n) * n| <= majorArcError(n)"
+    },
+    "minor_arc_contribution_bound": {
+      "status": "paper",
+      "statement": "for all even n > minorArcThreshold, |minorArcContribution(n)| <= minorArcError(n)"
+    },
+    "total_linear_error_bound": {
+      "status": "paper",
+      "statement": "for all even n > totalLinearErrorThreshold, majorArcError(n) + minorArcError(n) <= analyticErrorCoefficient * n"
+    }
+  },
+  "canonicalContaminationThresholdBound": {
+    "status": "missing",
+    "statement": "estimate.canonicalContaminationThreshold <= finite_certificate_bound"
+  },
+  "notes": "Template only. This is the narrow quarter-base decomposition handoff for a total error proof in the common linear form majorArcError + minorArcError <= epsilon*n. Lean converts epsilon <= relativeError/4 and the quarter singular-series lower bound into the main-term-relative total analytic error obligation. The template still needs formal Lean declarations for the raw decomposition, major arc approximation, minor arc contribution bound, total linear error bound, and final canonical contamination threshold coverage."
+}

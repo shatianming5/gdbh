@@ -1,0 +1,33 @@
+{
+  "kind": "vonMangoldt_split_threshold_positive_linear_canonical_weight_sum_major_minor_arc_estimate",
+  "version": 1,
+  "status": "template",
+  "lean_object": "Gdbh.VonMangoldtSplitThresholdPositiveLinearCanonicalWeightSumMajorMinorArcEstimate",
+  "imports": ["Gdbh.VonMangoldtGoldbach"],
+  "finite_certificate_bound": 100,
+  "finiteCertificateTheorem": "Gdbh.goldbachUpTo100",
+  "combinedThreshold": 100,
+  "linearNetThreshold": 100,
+  "coefficient": "1/8",
+  "mainTerm": "exampleMajorMinorMainTerm",
+  "majorArcError": "exampleMajorArcError",
+  "minorArcError": "exampleMinorArcError",
+  "obligations": {
+    "combined_lower_bound": {
+      "status": "missing",
+      "statement": "for all even n > combinedThreshold, mainTerm(n) - majorArcError(n) <= RawVonMangoldtGoldbachSum(n) + minorArcError(n)",
+      "lean_declaration": ""
+    },
+    "linear_net_lower_bound": {
+      "status": "missing",
+      "statement": "for all even n > linearNetThreshold, coefficient * n + minorArcError(n) <= mainTerm(n) - majorArcError(n)",
+      "lean_declaration": ""
+    }
+  },
+  "canonicalContaminationThresholdBound": {
+    "status": "missing",
+    "statement": "estimate.canonicalContaminationThreshold <= finite_certificate_bound",
+    "lean_term": ""
+  },
+  "notes": "Template only. This is the split-threshold positive-linear canonical major/minor route: the analytic side supplies the combined raw lower estimate and the positive linear net estimate, while Lean cancels the minor error, supplies the canonical non-prime-prime-power weight-sum bound, and adds the canonical linear contamination threshold. The remaining obligations are the two major/minor inequalities and final canonical contamination threshold coverage."
+}

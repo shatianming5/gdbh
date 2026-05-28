@@ -1,0 +1,47 @@
+{
+  "kind": "vonMangoldt_dft_uniform_minor_sq_positive_linear_explicit_contamination_canonical_lower_bound",
+  "version": 1,
+  "status": "template",
+  "lean_object": "Gdbh.DiscreteCircleMethod.VonMangoldtDftUniformMinorSqPositiveLinearExplicitContaminationCanonicalLowerBound",
+  "imports": [
+    "Gdbh.VonMangoldtGoldbach",
+    "Gdbh.DiscreteCircleMethod"
+  ],
+  "finite_certificate_bound": 100,
+  "finiteCertificateTheorem": "Gdbh.goldbachUpTo100",
+  "majorArcThreshold": 100,
+  "minorArcThreshold": 100,
+  "contaminationThreshold": 100,
+  "coefficient": "1/8",
+  "majorArcs": "analyticMajorArcs",
+  "minorArcDftBound": "analyticMinorArcDftBound",
+  "minorArcError": "analyticMinorArcError",
+  "obligations": {
+    "major_arc_linear_lower_bound": {
+      "status": "missing",
+      "statement": "for all even n > majorArcThreshold, coefficient * n + minorArcError(n) <= rawVonMangoldtFourierMajorArcContribution(majorArcs, n)",
+      "lean_declaration": ""
+    },
+    "minor_arc_uniform_dft_bound_valid": {
+      "status": "missing",
+      "statement": "for all even n > minorArcThreshold and k outside majorArcs(n), |vonMangoldtZModDft(n,k)| <= minorArcDftBound(n)",
+      "lean_declaration": ""
+    },
+    "minor_arc_dft_bound_sq_error_bound": {
+      "status": "missing",
+      "statement": "for all even n > minorArcThreshold, minorArcDftBound(n)^2 <= minorArcError(n)",
+      "lean_declaration": ""
+    },
+    "contamination_dominated": {
+      "status": "missing",
+      "statement": "for all even n > contaminationThreshold, 2 * vonMangoldtWeightSumContaminationBudget(canonicalNonPrimePrimePowerVonMangoldtWeightSumBound, n) < coefficient * n",
+      "lean_declaration": ""
+    },
+    "contamination_sqrt_log_model_bound": {
+      "status": "missing",
+      "statement": "for all even n > contaminationThreshold, vonMangoldtSqrtLogBudgetComparisonConstant * sqrt(n) * log(n)^3 < coefficient * n",
+      "lean_declaration": ""
+    }
+  },
+  "notes": "Template only. This is the direct DFT positive-linear route with an explicit contamination threshold: the analytic side supplies a lower bound for the real major-frequency contribution, a uniform minor DFT estimate with M(n)^2 <= minorArcError(n), and explicit domination of the canonical prime-power contamination budget. The minor DFT bound does not need a separate nonnegativity declaration, because the Lean bridge uses the squared uniform bound directly. If contaminationThreshold >= 2, the optional contamination_sqrt_log_model_bound can derive contamination_dominated through the formalized sqrt(n)*log(n)^3 comparison theorem. Lean derives the final threshold from majorArcThreshold, minorArcThreshold, and contaminationThreshold, avoiding the noncomputable canonicalLinearContaminationThreshold."
+}

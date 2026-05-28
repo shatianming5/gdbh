@@ -1,0 +1,35 @@
+{
+  "kind": "vonMangoldt_dft_uniform_minor_sq_fixed_error_quarter_major_minor_lower_bound_sqrt_log_contamination_canonical_weight_sum_estimate",
+  "version": 1,
+  "status": "template",
+  "lean_object": "Gdbh.DiscreteCircleMethod.VonMangoldtDftUniformMinorSqFixedErrorQuarterMajorMinorLowerBoundSqrtLogContaminationCanonicalWeightSumEstimate",
+  "imports": [
+    "Gdbh.VonMangoldtGoldbach",
+    "Gdbh.DiscreteCircleMethod"
+  ],
+  "finite_certificate_bound": 100,
+  "finiteCertificateTheorem": "Gdbh.goldbachUpTo100",
+  "majorArcThreshold": 100,
+  "minorArcThreshold": 100,
+  "contaminationThreshold": 100,
+  "relativeError": "1/2",
+  "majorArcs": "analyticMajorArcs",
+  "minorArcDftBound": "analyticMinorArcDftBound",
+  "obligations": {
+    "major_arc_lower_bound": {
+      "status": "missing",
+      "statement": "for all even n > majorArcThreshold, (1 - relativeError) * goldbachSingularSeriesFromQuarter(n) * n + minorArcDftBound(n)^2 <= rawVonMangoldtFourierMajorArcContribution(majorArcs, n)",
+      "lean_declaration": ""
+    },
+    "minor_arc_uniform_dft_bound_valid": {
+      "status": "missing",
+      "statement": "for all even n > minorArcThreshold and k outside majorArcs(n), |vonMangoldtZModDft(n,k)| <= minorArcDftBound(n)",
+      "lean_declaration": ""
+    },
+    "contamination_sqrt_log_model_bound": {
+      "status": "missing",
+      "statement": "for all even n > contaminationThreshold, vonMangoldtSqrtLogBudgetComparisonConstant * sqrt(n) * log(n)^3 < (1 - relativeError) * (1/4) * n",
+      "lean_declaration": ""
+    }
+  }
+}

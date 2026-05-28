@@ -1,0 +1,24 @@
+{
+  "kind": "vonMangoldt_positive_linear_raw_canonical_weight_sum_lower_bound",
+  "version": 1,
+  "status": "template",
+  "lean_object": "Gdbh.VonMangoldtPositiveLinearRawCanonicalWeightSumLowerBound",
+  "imports": ["Gdbh.VonMangoldtGoldbach"],
+  "finite_certificate_bound": 100,
+  "finiteCertificateTheorem": "Gdbh.goldbachUpTo100",
+  "threshold": 100,
+  "coefficient": "1/8",
+  "obligations": {
+    "raw_linear_lower_bound": {
+      "status": "missing",
+      "statement": "for all even n > threshold, coefficient * n <= RawVonMangoldtGoldbachSum(n)",
+      "lean_declaration": ""
+    }
+  },
+  "canonicalContaminationThresholdBound": {
+    "status": "missing",
+    "statement": "estimate.canonicalContaminationThreshold <= finite_certificate_bound",
+    "lean_term": ""
+  },
+  "notes": "Template only. This is the most compressed canonical raw-von-Mangoldt route: the analytic side supplies a pointwise positive linear lower bound for RawVonMangoldtGoldbachSum, while Lean supplies the canonical non-prime-prime-power weight-sum bound and the eventual contamination domination. The remaining obligations are the raw linear lower bound and final canonical contamination threshold coverage."
+}
