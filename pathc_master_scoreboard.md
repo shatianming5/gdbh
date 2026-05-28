@@ -6519,3 +6519,126 @@ Candidate: residue-prime cardinal input for filtered envelope
   Risk: moderate; useful for finite fallback, but insufficient alone for the
         eventual analytic log-squared branch
 ```
+
+## Round 84 - residue-prime cardinal input for filtered envelope
+
+Controller status:
+
+One Round84 scout was requested but failed before starting because the
+tool-layer thread limit remains occupied by stale agent entries:
+
+```text
+round84_cardinal_input_scout failed: collab spawn failed: agent thread limit reached
+```
+
+The controller proceeded directly because the task was a small public
+cardinality-input application of the verified Round83 envelope.
+
+Score decision:
+
+```text
+Candidate: residue-prime cardinal input for filtered envelope
+  FinalChainImpact      4
+  ResidualReduction     4
+  VerificationGain      7
+  DecompositionQuality  7
+  ReuseValue            7
+  FalsePropRisk         0
+  IntegrationRisk       3
+  ScopeDriftRisk        0
+  ExpectedDelta         34
+  Decision              execute
+
+Candidate: finite-prefix log-squared absorption now
+  FinalChainImpact      5
+  ResidualReduction     5
+  VerificationGain      3
+  DecompositionQuality  5
+  ReuseValue            5
+  FalsePropRisk         1
+  IntegrationRisk       6
+  ScopeDriftRisk        0
+  ExpectedDelta         31
+  Decision              defer until log lower-bound details are isolated
+
+Candidate: direct analytic filtered-cover closure
+  FinalChainImpact      8
+  ResidualReduction     10
+  VerificationGain      2
+  DecompositionQuality  3
+  ReuseValue            3
+  FalsePropRisk         4
+  IntegrationRisk       8
+  ScopeDriftRisk        0
+  ExpectedDelta         34
+  Decision              defer
+```
+
+The new file
+`Gdbh/PathC_ResidueRemainderWitnessCoverFilteredEnvelopeApplications.lean`,
+imported from `Gdbh.lean`, makes the elementary cardinal input public:
+
+```text
+residuePrimeSet_card_le_self
+residuePrimeSet_card_le_of_le
+```
+
+and applies the Round83 envelope to at-sqrt finite prefixes:
+
+```text
+residueDoubleDivisorSharedPrimeDivisorWitnessFilteredCoverSumAtSqrt_le_bound_mul_n_of_sqrt_at_most
+residueDoubleDivisorSharedPrimeDivisorWitnessFilteredCoverSumAtSqrt_le_bound_mul_n_of_sqrt_le_ten_thousand
+```
+
+It also names a linear finite-prefix worker:
+
+```text
+ResidueSharedPrimeWitnessFilteredCoverLinearFinitePrefixAtSqrt
+ResidueSharedPrimeWitnessFilteredCoverLinearFinitePrefixWithConstant
+residueSharedPrimeWitnessFilteredCoverLinearFinitePrefixAtSqrt_explicit
+residueSharedPrimeWitnessFilteredCoverLinearFinitePrefixWithConstant_explicit
+```
+
+The key reusable theorem is:
+
+```text
+Nat.sqrt n <= N
+  =>
+residueDoubleDivisorSharedPrimeDivisorWitnessFilteredCoverSumAtSqrt n
+  <= residueFilteredCoverSqrtAtMostEnvelope N * n
+```
+
+where
+
+```text
+residueFilteredCoverSqrtAtMostEnvelope N =
+  residueFilteredCoverCardinalityEnvelope N.
+```
+
+This is still intentionally linear in `n`.  It is a finite fallback and
+support-size normalization, not the eventual large-range log-squared worker.
+
+Verification for Round 84 passed:
+
+* `lake env lean Gdbh/PathC_ResidueRemainderWitnessCoverFilteredEnvelopeApplications.lean`
+* `lake build`
+* `python3 audit_lean_source.py`
+* `bash scripts/audit_full.sh`
+* `python3 scripts/regenerate_agents_md.py`
+
+The single-file and full-build checks printed allowed axiom sets for the new
+public theorem dependencies.  The source audit scanned 282 Lean files with no
+banned project assumptions or placeholders.  The full audit reported 281 Lean
+files under `Gdbh/`, 237,128 lines, 7,460 theorem/lemma declarations, 3,099
+definitions, zero genuine `sorry` or `admit`, zero axiom declarations, and
+both headline theorems with exactly `[propext, Classical.choice, Quot.sound]`.
+
+Next score-positive candidate:
+
+```text
+Candidate: filtered finite-prefix log absorption
+  Goal: isolate a small lemma turning the linear finite-prefix envelope into
+        a finite-prefix log-squared bound when 16 <= n and Nat.sqrt n <= N
+  ExpectedDelta: about 33-37
+  Risk: moderate; needs careful positive lower bound for log(n)^2 on n >= 16
+```

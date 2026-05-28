@@ -27,6 +27,7 @@ Generated from local workspace `/Users/tommy/Downloads/gdbh`.
 12. `Gdbh/PathC_ResidueRemainderWitnessCoverRearrange.lean`
 13. `Gdbh/PathC_ResidueRemainderWitnessCoverFiltered.lean`
 14. `Gdbh/PathC_ResidueRemainderWitnessCoverFilteredEnvelope.lean`
+15. `Gdbh/PathC_ResidueRemainderWitnessCoverFilteredEnvelopeApplications.lean`
 
 ## Active Goal
 
@@ -69,7 +70,7 @@ Use targeted `#print axioms` probes for individual theorems. Do not run
 
 ## Current Verified State
 
-Latest verified mathematical round in the scoreboard is Round 83.
+Latest verified mathematical round in the scoreboard is Round 84.
 
 Round 75 added the coprime/non-coprime compatible-remainder split:
 
@@ -426,6 +427,59 @@ lines, 7,454 theorem/lemma declarations, 3,096 definitions, zero genuine `sorry`
 or `admit`, zero axiom declarations, and both headline theorems exactly
 `[propext, Classical.choice, Quot.sound]`.
 
+Round 84 added filtered-envelope finite-prefix applications:
+
+- `Gdbh/PathC_ResidueRemainderWitnessCoverFilteredEnvelopeApplications.lean`
+- import in `Gdbh.lean`
+- public cardinal input:
+
+```text
+residuePrimeSet_card_le_self
+residuePrimeSet_card_le_of_le
+```
+
+At-sqrt envelope applications:
+
+```text
+residueDoubleDivisorSharedPrimeDivisorWitnessFilteredCoverSumAtSqrt_le_bound_mul_n_of_sqrt_at_most
+residueDoubleDivisorSharedPrimeDivisorWitnessFilteredCoverSumAtSqrt_le_bound_mul_n_of_sqrt_le_ten_thousand
+```
+
+Linear finite-prefix worker:
+
+```text
+ResidueSharedPrimeWitnessFilteredCoverLinearFinitePrefixAtSqrt
+ResidueSharedPrimeWitnessFilteredCoverLinearFinitePrefixWithConstant
+residueSharedPrimeWitnessFilteredCoverLinearFinitePrefixAtSqrt_explicit
+residueSharedPrimeWitnessFilteredCoverLinearFinitePrefixWithConstant_explicit
+```
+
+The theorem shape is:
+
+```text
+Nat.sqrt n <= N
+  =>
+residueDoubleDivisorSharedPrimeDivisorWitnessFilteredCoverSumAtSqrt n
+  <= residueFilteredCoverSqrtAtMostEnvelope N * n
+```
+
+This is only a linear finite-prefix envelope.  It does not close the eventual
+large-range log-squared filtered-cover worker.
+
+Round 84 verification passed:
+
+- `lake env lean Gdbh/PathC_ResidueRemainderWitnessCoverFilteredEnvelopeApplications.lean`
+- `lake build`
+- `python3 audit_lean_source.py`
+- `bash scripts/audit_full.sh`
+- `python3 scripts/regenerate_agents_md.py`
+
+The source audit scanned 282 Lean files with no banned project assumptions or
+placeholders.  The full audit reported 281 Lean files under `Gdbh/`, 237,128
+lines, 7,460 theorem/lemma declarations, 3,099 definitions, zero genuine `sorry`
+or `admit`, zero axiom declarations, and both headline theorems exactly
+`[propext, Classical.choice, Quot.sound]`.
+
 ## Most Recent Non-Math Work
 
 The repository was initialized locally, pushed to GitHub, and then updated
@@ -441,44 +495,44 @@ regeneration.
 
 ## Suggested Next Round
 
-Continue with Round 84.
+Continue with Round 85.
 
 Primary candidate:
 
 ```text
-Candidate: residue-prime cardinal input for filtered envelope
-  Goal: connect existing explicit prime-set cardinal bounds to the new
-        filtered-cover envelope for finite or threshold ranges
-  ExpectedDelta: about 32-36
-  Risk: moderate; useful finite fallback, insufficient alone for eventual
-        analytic log-squared closure
+Candidate: filtered finite-prefix log absorption
+  Goal: isolate a small lemma turning the linear finite-prefix envelope into
+        a finite-prefix log-squared bound when 16 <= n and Nat.sqrt n <= N
+  ExpectedDelta: about 33-37
+  Risk: moderate; needs careful positive lower bound for log(n)^2 on n >= 16
   Execute if Lean proof is small and additive
 ```
 
 Reason:
 
-Round83 proved the crude finite envelope:
+Round84 proved the linear finite-prefix envelope:
 
 ```text
-filtered cover <= M * (2^M)^2 * 2n
-whenever (residuePrimeSet z).card <= M
+Nat.sqrt n <= N
+  =>
+filtered cover at sqrt <= residueFilteredCoverSqrtAtMostEnvelope N * n
 ```
 
-The next useful decomposition is to feed existing verified cardinal bounds
-into this envelope for explicit finite or threshold ranges, while keeping the
-eventual large-range analytic task separate.
+The next useful finite-prefix step is to absorb the missing `(log n)^2`
+factor using a verified lower bound for `Real.log n` on `n >= 16`, without
+touching the eventual large-range analytic branch.
 
 Possible additive file:
 
 ```text
-Gdbh/PathC_ResidueRemainderWitnessCoverFilteredEnvelopeApplications.lean
+Gdbh/PathC_ResidueRemainderWitnessCoverFilteredFinitePrefix.lean
 ```
 
 Possible public theorems:
 
 ```text
-residueDoubleDivisorSharedPrimeDivisorWitnessFilteredCoverSumAtSqrt_le_explicitEnvelope_of_sqrt_bound
-residueSharedPrimeWitnessFilteredCoverFiniteRangeFallback
+residueSharedPrimeWitnessFilteredCoverLogSquaredFinitePrefixAtSqrt_explicit
+ResidueSharedPrimeWitnessFilteredCoverLogSquaredFinitePrefixWithConstant
 ```
 
 Secondary candidate:
@@ -508,4 +562,4 @@ sed -n '1,140p' AGENTS.md
 tail -n 260 pathc_master_scoreboard.md
 ```
 
-Then start Round 84 with the master-controller workflow above.
+Then start Round 85 with the master-controller workflow above.
