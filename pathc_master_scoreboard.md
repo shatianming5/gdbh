@@ -6642,3 +6642,132 @@ Candidate: filtered finite-prefix log absorption
   ExpectedDelta: about 33-37
   Risk: moderate; needs careful positive lower bound for log(n)^2 on n >= 16
 ```
+
+## Round 85 - filtered finite-prefix log absorption
+
+Controller status:
+
+One Round85 scout was requested but failed before starting because the
+tool-layer thread limit remains occupied by stale agent entries:
+
+```text
+round85_log_absorption_scout failed: collab spawn failed: agent thread limit reached
+```
+
+The controller proceeded directly.  This was score-positive because it only
+uses the Round84 finite-prefix linear envelope and the elementary consequence
+`Nat.sqrt n <= N -> n < (N + 1)^2`; it does not claim any global or eventual
+log-squared estimate.
+
+Score decision:
+
+```text
+Candidate: filtered finite-prefix log absorption
+  FinalChainImpact      5
+  ResidualReduction     6
+  VerificationGain      8
+  DecompositionQuality  8
+  ReuseValue            8
+  FalsePropRisk         0
+  IntegrationRisk       3
+  ScopeDriftRisk        0
+  ExpectedDelta         36
+  Decision              execute
+
+Candidate: promote finite-prefix bridge to eventual filtered-cover worker
+  FinalChainImpact      6
+  ResidualReduction     6
+  VerificationGain      3
+  DecompositionQuality  4
+  ReuseValue            6
+  FalsePropRisk         2
+  IntegrationRisk       6
+  ScopeDriftRisk        1
+  ExpectedDelta         25
+  Decision              defer; needs a separate finite/tail split, not a direct global claim
+
+Candidate: direct analytic filtered-cover log-squared closure
+  FinalChainImpact      8
+  ResidualReduction     10
+  VerificationGain      2
+  DecompositionQuality  3
+  ReuseValue            3
+  FalsePropRisk         4
+  IntegrationRisk       8
+  ScopeDriftRisk        0
+  ExpectedDelta         34
+  Decision              defer
+```
+
+The new file
+`Gdbh/PathC_ResidueRemainderWitnessCoverFilteredFinitePrefix.lean`, imported
+from `Gdbh.lean`, defines the explicit finite log-loss:
+
+```text
+residueFilteredCoverFinitePrefixLogLoss N =
+  (Real.log (((N + 1) * (N + 1) : Nat) : Real))^2
+```
+
+and proves the elementary prefix/log monotonicity layer:
+
+```text
+nat_lt_succ_sq_of_sqrt_le
+log_nat_sq_le_finitePrefixLogLoss
+```
+
+It then names a log-squared finite-prefix worker:
+
+```text
+ResidueSharedPrimeWitnessFilteredCoverLogSquaredFinitePrefixAtSqrt
+ResidueSharedPrimeWitnessFilteredCoverLogSquaredFinitePrefixWithConstant
+```
+
+and supplies the bridge from the Round84 linear worker:
+
+```text
+residueSharedPrimeWitnessFilteredCoverLogSquaredFinitePrefixAtSqrt_of_linear
+residueSharedPrimeWitnessFilteredCoverLogSquaredFinitePrefixAtSqrt_explicit
+residueSharedPrimeWitnessFilteredCoverLogSquaredFinitePrefixWithConstant_explicit
+residueSharedPrimeWitnessFilteredCoverLogSquaredFinitePrefixAtSqrt_ten_thousand
+```
+
+The key reusable theorem shape is:
+
+```text
+Nat.sqrt n <= N
+  =>
+filtered cover at sqrt
+  <= (residueFilteredCoverSqrtAtMostEnvelope N
+        * residueFilteredCoverFinitePrefixLogLoss N)
+     * n / (log n)^2
+```
+
+for `16 <= n`.  This is a bounded-prefix bridge only; the coefficient depends
+on `N`, so it does not close the eventual large-range analytic worker.
+
+Verification for Round 85 passed:
+
+* `lake env lean Gdbh/PathC_ResidueRemainderWitnessCoverFilteredFinitePrefix.lean`
+* `lake build`
+* `python3 audit_lean_source.py`
+* `bash scripts/audit_full.sh`
+* `python3 scripts/regenerate_agents_md.py`
+
+The single-file and full-build checks printed allowed axiom sets for the new
+public theorem dependencies.  The source audit scanned 283 Lean files with no
+banned project assumptions or placeholders.  The full audit reported 282 Lean
+files under `Gdbh/`, 237,299 lines, 7,466 theorem/lemma declarations, 3,102
+definitions, zero genuine `sorry` or `admit`, zero axiom declarations, and
+both headline theorems with exactly `[propext, Classical.choice, Quot.sound]`.
+
+Next score-positive candidate:
+
+```text
+Candidate: finite/tail split adapter for filtered-cover branch
+  Goal: combine the new bounded-prefix log-squared bridge with an explicit
+        tail worker shape, so future large-range estimates only need to handle
+        Nat.sqrt n > N for a named N.
+  ExpectedDelta: about 30-34
+  Risk: moderate; useful only if it preserves the existing eventual worker
+        shape and avoids pretending the finite-prefix constant is uniform
+```

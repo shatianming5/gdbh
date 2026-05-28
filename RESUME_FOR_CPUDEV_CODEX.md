@@ -480,6 +480,68 @@ lines, 7,460 theorem/lemma declarations, 3,099 definitions, zero genuine `sorry`
 or `admit`, zero axiom declarations, and both headline theorems exactly
 `[propext, Classical.choice, Quot.sound]`.
 
+Round 85 added finite-prefix log-squared absorption for the filtered cover:
+
+- `Gdbh/PathC_ResidueRemainderWitnessCoverFilteredFinitePrefix.lean`
+- import in `Gdbh.lean`
+- public finite log-loss:
+
+```text
+residueFilteredCoverFinitePrefixLogLoss N =
+  (Real.log (((N + 1) * (N + 1) : Nat) : Real))^2
+```
+
+Elementary prefix/log monotonicity layer:
+
+```text
+nat_lt_succ_sq_of_sqrt_le
+log_nat_sq_le_finitePrefixLogLoss
+```
+
+Log-squared finite-prefix worker:
+
+```text
+ResidueSharedPrimeWitnessFilteredCoverLogSquaredFinitePrefixAtSqrt
+ResidueSharedPrimeWitnessFilteredCoverLogSquaredFinitePrefixWithConstant
+```
+
+Bridge and explicit envelopes:
+
+```text
+residueSharedPrimeWitnessFilteredCoverLogSquaredFinitePrefixAtSqrt_of_linear
+residueSharedPrimeWitnessFilteredCoverLogSquaredFinitePrefixAtSqrt_explicit
+residueSharedPrimeWitnessFilteredCoverLogSquaredFinitePrefixWithConstant_explicit
+residueSharedPrimeWitnessFilteredCoverLogSquaredFinitePrefixAtSqrt_ten_thousand
+```
+
+The theorem shape is:
+
+```text
+Nat.sqrt n <= N
+  =>
+filtered cover at sqrt
+  <= (residueFilteredCoverSqrtAtMostEnvelope N
+        * residueFilteredCoverFinitePrefixLogLoss N)
+     * n / (log n)^2
+```
+
+for `16 <= n`.  This is still only a bounded-prefix bridge because the
+coefficient depends on `N`.
+
+Round 85 verification passed:
+
+- `lake env lean Gdbh/PathC_ResidueRemainderWitnessCoverFilteredFinitePrefix.lean`
+- `lake build`
+- `python3 audit_lean_source.py`
+- `bash scripts/audit_full.sh`
+- `python3 scripts/regenerate_agents_md.py`
+
+The source audit scanned 283 Lean files with no banned project assumptions or
+placeholders.  The full audit reported 282 Lean files under `Gdbh/`, 237,299
+lines, 7,466 theorem/lemma declarations, 3,102 definitions, zero genuine `sorry`
+or `admit`, zero axiom declarations, and both headline theorems exactly
+`[propext, Classical.choice, Quot.sound]`.
+
 ## Most Recent Non-Math Work
 
 The repository was initialized locally, pushed to GitHub, and then updated
@@ -495,44 +557,44 @@ regeneration.
 
 ## Suggested Next Round
 
-Continue with Round 85.
+Continue with Round 86.
 
 Primary candidate:
 
 ```text
-Candidate: filtered finite-prefix log absorption
-  Goal: isolate a small lemma turning the linear finite-prefix envelope into
-        a finite-prefix log-squared bound when 16 <= n and Nat.sqrt n <= N
-  ExpectedDelta: about 33-37
-  Risk: moderate; needs careful positive lower bound for log(n)^2 on n >= 16
-  Execute if Lean proof is small and additive
+Candidate: finite/tail split adapter for filtered-cover branch
+  Goal: combine the new bounded-prefix log-squared bridge with an explicit
+        tail worker shape, so future large-range estimates only need to handle
+        Nat.sqrt n > N for a named N.
+  ExpectedDelta: about 30-34
+  Risk: moderate; useful only if it preserves the existing eventual worker
+        shape and avoids pretending the finite-prefix constant is uniform
 ```
 
 Reason:
 
-Round84 proved the linear finite-prefix envelope:
+Round85 proves a bounded-prefix log-squared estimate:
 
 ```text
 Nat.sqrt n <= N
   =>
-filtered cover at sqrt <= residueFilteredCoverSqrtAtMostEnvelope N * n
+filtered cover at sqrt <= C(N) * n / (log n)^2
 ```
 
-The next useful finite-prefix step is to absorb the missing `(log n)^2`
-factor using a verified lower bound for `Real.log n` on `n >= 16`, without
-touching the eventual large-range analytic branch.
+The next useful integration step is to expose a clean threshold split:
+bounded prefix handled by Round85, tail left as the honest analytic worker.
 
 Possible additive file:
 
 ```text
-Gdbh/PathC_ResidueRemainderWitnessCoverFilteredFinitePrefix.lean
+Gdbh/PathC_ResidueRemainderWitnessCoverFilteredThresholdSplit.lean
 ```
 
 Possible public theorems:
 
 ```text
-residueSharedPrimeWitnessFilteredCoverLogSquaredFinitePrefixAtSqrt_explicit
-ResidueSharedPrimeWitnessFilteredCoverLogSquaredFinitePrefixWithConstant
+residueSharedPrimeWitnessFilteredCoverLogSquaredUpperAfter_of_thresholdSplit
+ResidueSharedPrimeWitnessFilteredCoverLogSquaredThresholdSplit
 ```
 
 Secondary candidate:
