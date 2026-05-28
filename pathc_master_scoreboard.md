@@ -5948,3 +5948,160 @@ Candidate: divisor-witness cover inequality
   ExpectedDelta: about 36-40
   Risk: moderate, because it needs absolute values and finite-cover bookkeeping
 ```
+
+## Round 80 - finite cover for divisor witnesses
+
+Controller status:
+
+Three Round80 scout starts were attempted and rejected by the tool-layer
+thread limit:
+
+```text
+round80_cover_shape_scout
+round80_finset_abs_scout
+round80_worker_bridge_scout
+```
+
+The controller proceeded directly because the target was a narrow algebraic
+cover inequality and the proof shape was visible from existing
+`Finset.abs_sum_le_sum_abs` residue-envelope files.  No running useful agent
+was closed.
+
+Score decision:
+
+```text
+Candidate: divisor-witness finite cover upper worker
+  FinalChainImpact      6
+  ResidualReduction     6
+  VerificationGain      6
+  DecompositionQuality  8
+  ReuseValue            7
+  FalsePropRisk         0
+  IntegrationRisk       4
+  ScopeDriftRisk        0
+  ExpectedDelta         45
+  Decision              execute
+
+Candidate: naive disjoint sum over witness primes
+  FinalChainImpact      6
+  ResidualReduction     6
+  VerificationGain      1
+  DecompositionQuality  2
+  ReuseValue            2
+  FalsePropRisk         5
+  IntegrationRisk       9
+  ScopeDriftRisk        0
+  ExpectedDelta         11
+  Decision              reject: witnesses overlap
+
+Candidate: direct cover analytic log-squared closure
+  FinalChainImpact      8
+  ResidualReduction     10
+  VerificationGain      2
+  DecompositionQuality  3
+  ReuseValue            2
+  FalsePropRisk         4
+  IntegrationRisk       8
+  ScopeDriftRisk        0
+  ExpectedDelta         33
+  Decision              defer
+
+Candidate: scoreboard-only note
+  FinalChainImpact      1
+  ResidualReduction     0
+  VerificationGain      2
+  DecompositionQuality  4
+  ReuseValue            2
+  FalsePropRisk         0
+  IntegrationRisk       0
+  ScopeDriftRisk        1
+  ExpectedDelta         18
+  Decision              defer
+```
+
+The new file `Gdbh/PathC_ResidueRemainderWitnessCover.lean`, imported from
+`Gdbh.lean`, defines a finite cover for the Round79 divisor-witness branch and
+proves that controlling the cover controls the signed remainder.  The cover is
+explicitly not disjoint: every residue-prime divisor witness contributes a
+nonnegative copy of the pair magnitude.
+
+Public definitions and worker Props added:
+
+```text
+residueSharedPrimeDivisorWitnessPairCover
+residueDoubleDivisorSharedPrimeDivisorWitnessCoverSum
+residueDoubleDivisorSharedPrimeDivisorWitnessCoverSumAtSqrt
+ResidueSharedPrimeWitnessCoverLogSquaredUpperAfter
+ResidueSharedPrimeWitnessCoverLogSquaredUpperEventually
+ResidueCompatibleRemainderWitnessCoverSplitLogSquaredUpperEventually
+```
+
+Public bridges added:
+
+```text
+residueSharedPrimeDivisorWitnessPairCover_nonneg
+residueSharedPrimeDivisorWitnessPair_abs_le_cover
+residueDoubleDivisorSharedPrimeDivisorWitnessRemainderSum_abs_le_coverSum
+residueDoubleDivisorSharedPrimeDivisorWitnessRemainderSumAtSqrt_abs_le_coverSum
+residueSharedPrimeDivisorWitnessRemainderLogSquaredUpperAfter_of_cover
+residueSharedPrimeDivisorWitnessRemainderLogSquaredUpperEventually_of_cover
+residueCompatibleRemainderDivisorWitnessSplitLogSquaredUpperEventually_of_coverSplit
+pathC_kGoldbach_of_compatibleRemainderWitnessCoverSplit_and_countingInput
+```
+
+The new active decomposition is:
+
+```text
+ResidueCompatibleRemainderWitnessCoverSplitLogSquaredUpperEventually
+  = ResidueCoprimeCompatibleRemainderLogSquaredUpperEventually
+    and ResidueSharedPrimeWitnessCoverLogSquaredUpperEventually
+  => ResidueCompatibleRemainderDivisorWitnessSplitLogSquaredUpperEventually
+  => ResidueCompatibleRemainderWitnessSplitLogSquaredUpperEventually
+  => ResidueCompatibleRemainderIntersectionSplitLogSquaredUpperEventually
+  => ...
+  => Path C K-Goldbach
+```
+
+The key cover inequality is:
+
+```text
+abs (residueSharedPrimeDivisorWitnessPairCountingRemainder n z d1 d2)
+  <= residueSharedPrimeDivisorWitnessPairCover n z d1 d2
+```
+
+and the double-sum bridge is:
+
+```text
+abs (residueDoubleDivisorSharedPrimeDivisorWitnessRemainderSum n z k)
+  <= residueDoubleDivisorSharedPrimeDivisorWitnessCoverSum n z k
+```
+
+This is score-positive because it turns the overlapping witness support into a
+usable nonnegative majorant without asserting any cancellation, asymptotic, or
+disjoint partition.  It moves the remaining shared-prime task to an explicit
+cover upper bound.
+
+Verification for Round 80 passed:
+
+* `lake env lean Gdbh/PathC_ResidueRemainderWitnessCover.lean`
+* `lake build`
+* `python3 audit_lean_source.py`
+* `bash scripts/audit_full.sh`
+* `python3 scripts/regenerate_agents_md.py`
+
+The single-file and full-build checks printed allowed axiom sets for the new
+public theorem dependencies.  The source audit scanned 278 Lean files with no
+banned project assumptions or placeholders.  The full audit reported 277 Lean
+files under `Gdbh/`, 236,160 lines, 7,429 theorem/lemma declarations, 3,084
+definitions, zero genuine `sorry` or `admit`, zero axiom declarations, and
+both headline theorems with exactly `[propext, Classical.choice, Quot.sound]`.
+
+Next score-positive candidate:
+
+```text
+Candidate: cover-sum rearrangement by witness prime
+  Goal: algebraically rewrite the cover sum as a sum over p in
+        residuePrimeDivisorWitnessSet n z of the pairs containing p
+  ExpectedDelta: about 38-42
+  Risk: moderate, mostly Finset sum_comm and filter bookkeeping
+```
