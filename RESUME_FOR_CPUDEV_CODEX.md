@@ -21,6 +21,7 @@ Generated from local workspace `/Users/tommy/Downloads/gdbh`.
 6. `Gdbh/PathC_ResidueRemainderCoprimeSplit.lean`
 7. `Gdbh/PathC_ResiduePrimeSetProductSupport.lean`
 8. `Gdbh/PathC_ResidueRemainderIntersectionSplit.lean`
+9. `Gdbh/PathC_ResidueRemainderSharedPrimeWitness.lean`
 
 ## Active Goal
 
@@ -63,7 +64,7 @@ Use targeted `#print axioms` probes for individual theorems. Do not run
 
 ## Current Verified State
 
-Latest verified mathematical round in the scoreboard is Round 77.
+Latest verified mathematical round in the scoreboard is Round 78.
 
 Round 75 added the coprime/non-coprime compatible-remainder split:
 
@@ -134,17 +135,54 @@ residueCompatibleRemainderCoprimeSplitLogSquaredUpperEventually_of_intersectionS
 pathC_kGoldbach_of_compatibleRemainderIntersectionSplit_and_countingInput
 ```
 
-Round 77 verification passed:
+Round 78 added the witness-supported shared-prime split:
 
-- `lake env lean Gdbh/PathC_ResidueRemainderIntersectionSplit.lean`
+- `Gdbh/PathC_ResidueRemainderSharedPrimeWitness.lean`
+- import in `Gdbh.lean`
+- active worker:
+
+```text
+ResidueCompatibleRemainderWitnessSplitLogSquaredUpperEventually
+  = ResidueCoprimeCompatibleRemainderLogSquaredUpperEventually
+    and ResidueSharedPrimeWitnessRemainderLogSquaredUpperEventually
+  => ResidueCompatibleRemainderIntersectionSplitLogSquaredUpperEventually
+  => ResidueCompatibleRemainderCoprimeSplitLogSquaredUpperEventually
+  => ResidueCompatibleRemainderLogSquaredUpperEventually
+  => ResidueRemainderLogSquaredUpperEventually
+  => ...
+  => Path C K-Goldbach
+```
+
+The witness-supported pair branch is:
+
+```text
+if exists p, p in d1 inter d2 and p divides n then
+  residueSharedPrimeIntersectionPairCountingRemainder n d1 d2
+else 0
+```
+
+Key bridges:
+
+```text
+residueSharedPrimeIntersection_prime_dvd_of_prod_dvd
+residueSharedPrimeIntersectionPairCountingRemainder_eq_witness
+residueDoubleDivisorSharedPrimeIntersectionRemainderSum_eq_witness
+residueSharedPrimeIntersectionRemainderLogSquaredUpperEventually_of_witness
+residueCompatibleRemainderIntersectionSplitLogSquaredUpperEventually_of_witnessSplit
+pathC_kGoldbach_of_compatibleRemainderWitnessSplit_and_countingInput
+```
+
+Round 78 verification passed:
+
+- `lake env lean Gdbh/PathC_ResidueRemainderSharedPrimeWitness.lean`
 - `lake build`
 - `python3 audit_lean_source.py`
 - `bash scripts/audit_full.sh`
 - `python3 scripts/regenerate_agents_md.py`
 
-The source audit scanned 275 Lean files with no banned project assumptions or
-placeholders.  The full audit reported 274 Lean files under `Gdbh/`, 235,380
-lines, 7,401 theorem/lemma declarations, 3,065 definitions, zero genuine `sorry` or
+The source audit scanned 276 Lean files with no banned project assumptions or
+placeholders.  The full audit reported 275 Lean files under `Gdbh/`, 235,635
+lines, 7,411 theorem/lemma declarations, 3,071 definitions, zero genuine `sorry` or
 `admit`, zero axiom declarations, and both headline theorems exactly
 `[propext, Classical.choice, Quot.sound]`.
 
@@ -161,52 +199,50 @@ with a compatibility copy:
 `Agent.md` should remain a compatibility copy of `AGENTS.md` after each
 regeneration.
 
-No Lean mathematical change has been made after Round 77.
+No Lean mathematical change has been made after Round 78.
 
 ## Suggested Next Round
 
-Continue with Round 78.
+Continue with Round 79.
 
 Primary candidate:
 
 ```text
-Candidate: shared-prime intersection support by witness prime
-  Goal: split the shared-prime branch by a witness p in d1 inter d2 and expose
-        the p | n consequence from (d1 inter d2).prod id | n
-  ExpectedDelta: about 38-42
-  Risk: low-to-moderate, finite-set coverage/overlap bookkeeping
+Candidate: witness-supported shared-prime divisor partition
+  Goal: split the witness branch by primes p dividing n, probably as a finite
+        support/filter normalization rather than a disjoint sum identity
+  ExpectedDelta: about 36-40
+  Risk: moderate, because multiple shared primes can witness the same pair
   Execute if Lean proof is small and additive
 ```
 
 Reason:
 
-Round77 made the non-coprime compatible branch explicit in intersection
-language:
+Round78 made the witness support explicit:
 
 ```text
-if d1 inter d2 = empty then 0
-else if (d1 inter d2).prod id divides n then residuePairCountingRemainder ...
+if exists p, p in d1 inter d2 and p divides n then
+  residueSharedPrimeIntersectionPairCountingRemainder ...
 else 0
 ```
 
-The next useful decomposition is to expose that if a nonempty intersection
-product divides `n`, then any witness prime in the intersection divides `n`.
-This is still algebraic and prepares the shared-prime branch for a divisor-of-n
-partition.  Keep it as a named worker Prop or theorem cluster first; do not
-attempt the full log-squared analytic bound in the same step.
+The next useful decomposition is to normalize this support against the finite
+set of primes dividing `n`.  Avoid claiming a disjoint sum over witnesses,
+because a pair can have multiple shared primes.  A support/filter equality or
+finite cover bound is safer than a naive sum identity.
 
 Possible additive file:
 
 ```text
-Gdbh/PathC_ResidueRemainderSharedPrimeWitness.lean
+Gdbh/PathC_ResidueRemainderWitnessDivisorPartition.lean
 ```
 
 Possible public theorems:
 
 ```text
-residueSharedPrimeIntersection_prod_dvd_of_mem
-residueSharedPrimeIntersectionPairCountingRemainder_eq_witnessSupported
-ResidueSharedPrimeWitnessRemainderLogSquaredUpperEventually
+residueSharedPrimeWitnessPairCountingRemainder_eq_zero_of_no_primeDivisorWitness
+residueSharedPrimeWitnessSupport_subset_primeDivisors
+ResidueSharedPrimeDivisorPartitionRemainderLogSquaredUpperEventually
 ```
 
 Secondary candidate:
@@ -236,4 +272,4 @@ sed -n '1,140p' AGENTS.md
 tail -n 260 pathc_master_scoreboard.md
 ```
 
-Then start Round 78 with the master-controller workflow above.
+Then start Round 79 with the master-controller workflow above.

@@ -5656,3 +5656,155 @@ Candidate: shared-prime intersection support by witness prime
   ExpectedDelta: about 38-42
   Risk: low-to-moderate, finite-set coverage/overlap bookkeeping
 ```
+
+## Round 78 - shared-prime witness support
+
+Controller status:
+
+The controller continued without new subagents because the tool-layer thread
+limit remained unavailable after Round77, while the candidate was still
+algebraic, additive, and directly verifiable.  This did not affect file-write
+isolation: the implementation lives in one new Lean file plus the barrel
+import.
+
+Score decision:
+
+```text
+Candidate: shared-prime witness-supported decomposition
+  FinalChainImpact      5
+  ResidualReduction     5
+  VerificationGain      5
+  DecompositionQuality  7
+  ReuseValue            6
+  FalsePropRisk         0
+  IntegrationRisk       4
+  ScopeDriftRisk        0
+  ExpectedDelta         38
+  Decision              execute
+
+Candidate: direct shared-prime log-squared analytic upper closure
+  FinalChainImpact      8
+  ResidualReduction     10
+  VerificationGain      2
+  DecompositionQuality  3
+  ReuseValue            2
+  FalsePropRisk         4
+  IntegrationRisk       8
+  ScopeDriftRisk        0
+  ExpectedDelta         33
+  Decision              defer
+
+Candidate: divisor-of-n partition by prime p immediately
+  FinalChainImpact      6
+  ResidualReduction     6
+  VerificationGain      3
+  DecompositionQuality  6
+  ReuseValue            5
+  FalsePropRisk         0
+  IntegrationRisk       6
+  ScopeDriftRisk        0
+  ExpectedDelta         36
+  Decision              defer until witness support is public
+
+Candidate: scoreboard-only note
+  FinalChainImpact      1
+  ResidualReduction     0
+  VerificationGain      2
+  DecompositionQuality  4
+  ReuseValue            2
+  FalsePropRisk         0
+  IntegrationRisk       0
+  ScopeDriftRisk        1
+  ExpectedDelta         18
+  Decision              defer
+```
+
+The new file `Gdbh/PathC_ResidueRemainderSharedPrimeWitness.lean`, imported
+from `Gdbh.lean`, refines the Round77 shared-prime branch by exposing an
+explicit prime witness `p ∈ d1 ∩ d2` with `p ∣ n`.
+
+Public definitions and worker Props added:
+
+```text
+residueSharedPrimeWitnessPairCountingRemainder
+residueDoubleDivisorSharedPrimeWitnessRemainderSum
+residueDoubleDivisorSharedPrimeWitnessRemainderSumAtSqrt
+ResidueSharedPrimeWitnessRemainderLogSquaredUpperAfter
+ResidueSharedPrimeWitnessRemainderLogSquaredUpperEventually
+ResidueCompatibleRemainderWitnessSplitLogSquaredUpperEventually
+```
+
+Public bridges added:
+
+```text
+residueSharedPrimeIntersection_prime_dvd_of_prod_dvd
+residueSharedPrimeIntersectionPairCountingRemainder_eq_zero_of_no_shared_prime_dvd
+residueSharedPrimeIntersectionPairCountingRemainder_eq_witness
+residueDoubleDivisorSharedPrimeIntersectionRemainderSum_eq_witness
+residueDoubleDivisorSharedPrimeIntersectionRemainderSumAtSqrt_eq_witness
+residueSharedPrimeIntersectionRemainderLogSquaredUpperAfter_of_witness
+residueSharedPrimeIntersectionRemainderLogSquaredUpperEventually_of_witness
+residueCompatibleRemainderIntersectionSplitLogSquaredUpperEventually_of_witnessSplit
+residueCompatibleRemainderCoprimeSplitLogSquaredUpperEventually_of_witnessSplit
+pathC_kGoldbach_of_compatibleRemainderWitnessSplit_and_countingInput
+```
+
+The new active decomposition is:
+
+```text
+ResidueCompatibleRemainderWitnessSplitLogSquaredUpperEventually
+  = ResidueCoprimeCompatibleRemainderLogSquaredUpperEventually
+    and ResidueSharedPrimeWitnessRemainderLogSquaredUpperEventually
+  => ResidueCompatibleRemainderIntersectionSplitLogSquaredUpperEventually
+  => ResidueCompatibleRemainderCoprimeSplitLogSquaredUpperEventually
+  => ResidueCompatibleRemainderLogSquaredUpperEventually
+  => ResidueRemainderLogSquaredUpperEventually
+  => ...
+  => Path C K-Goldbach
+```
+
+The witness-supported pair branch is:
+
+```text
+if exists p, p in d1 inter d2 and p divides n then
+  residueSharedPrimeIntersectionPairCountingRemainder n d1 d2
+else 0
+```
+
+The key support lemma is:
+
+```text
+residueSharedPrimeIntersection_prime_dvd_of_prod_dvd:
+  p in d1 inter d2
+  and (d1 inter d2).prod id divides n
+  => p divides n
+```
+
+This is score-positive because it prepares the shared-prime branch for a
+future divisor-of-`n` partition while staying purely algebraic.  It does not
+assert cancellation, asymptotics, or any primorial-sensitive inequality.
+
+Verification for Round 78 passed:
+
+* `lake env lean Gdbh/PathC_ResidueRemainderSharedPrimeWitness.lean`
+* `lake build`
+* `python3 audit_lean_source.py`
+* `bash scripts/audit_full.sh`
+* `python3 scripts/regenerate_agents_md.py`
+
+The single-file and full-build checks printed allowed axiom sets for the new
+public theorem dependencies.  The source audit scanned 276 Lean files with no
+banned project assumptions or placeholders.  The full audit reported 275 Lean
+files under `Gdbh/`, 235,635 lines, 7,411 theorem/lemma declarations, 3,071
+definitions, zero genuine `sorry` or `admit`, zero axiom declarations, and
+both headline theorems with exactly `[propext, Classical.choice, Quot.sound]`.
+
+Next score-positive candidate:
+
+```text
+Candidate: witness-supported shared-prime divisor partition
+  Goal: split the witness branch by primes p dividing n, probably as a finite
+        support/filter normalization rather than a disjoint sum identity
+  ExpectedDelta: about 36-40
+  Risk: moderate, because multiple shared primes can witness the same pair
+```

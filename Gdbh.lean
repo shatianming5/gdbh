@@ -252,6 +252,7 @@ import Gdbh.PathC_ResidueRemainderCompatibleSupport
 import Gdbh.PathC_ResidueRemainderCoprimeSplit
 import Gdbh.PathC_ResiduePrimeSetProductSupport
 import Gdbh.PathC_ResidueRemainderIntersectionSplit
+import Gdbh.PathC_ResidueRemainderSharedPrimeWitness
 import Gdbh.PathC_KEstimate
 import Gdbh.PathC_HalfDensityShape
 import Gdbh.FiniteQuotientObstruction
