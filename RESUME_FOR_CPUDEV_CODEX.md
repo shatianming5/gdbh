@@ -6,7 +6,7 @@ Generated from local workspace `/Users/tommy/Downloads/gdbh`.
 
 - GitHub: `https://github.com/shatianming5/gdbh`
 - Branch: `main`
-- Latest local/remote commit at handoff: `767eebe Add Agent.md compatibility copy`
+- Latest local/remote commit at handoff: run `git log -1 --oneline` after pull
 - Visibility at handoff: private
 - Local caches are intentionally excluded by `.gitignore`: `.lake/`,
   Python caches, and Lean build artifacts.
@@ -19,6 +19,7 @@ Generated from local workspace `/Users/tommy/Downloads/gdbh`.
 4. `goal.md`
 5. `pathc_master_scoreboard.md`
 6. `Gdbh/PathC_ResidueRemainderCoprimeSplit.lean`
+7. `Gdbh/PathC_ResiduePrimeSetProductSupport.lean`
 
 ## Active Goal
 
@@ -61,9 +62,9 @@ Use targeted `#print axioms` probes for individual theorems. Do not run
 
 ## Current Verified State
 
-Latest verified mathematical round in the scoreboard is Round 75.
+Latest verified mathematical round in the scoreboard is Round 76.
 
-Round 75 added:
+Round 75 added the coprime/non-coprime compatible-remainder split:
 
 - `Gdbh/PathC_ResidueRemainderCoprimeSplit.lean`
 - import in `Gdbh.lean`
@@ -79,15 +80,32 @@ ResidueCompatibleRemainderCoprimeSplitLogSquaredUpperEventually
   => Path C K-Goldbach
 ```
 
-Round 75 verification passed:
+Round 76 added public residue-prime product support:
 
-- `lake env lean Gdbh/PathC_ResidueRemainderCoprimeSplit.lean`
+- `Gdbh/PathC_ResiduePrimeSetProductSupport.lean`
+- import in `Gdbh.lean`
+- reusable theorem cluster:
+
+```text
+residuePrimeSubset_gcd_prod_eq_prod_inter
+residuePrimeSubset_lcm_prod_eq_prod_union
+residuePrimeSubset_gcd_prod_dvd_iff_inter_prod_dvd
+residuePrimeSubset_coprime_iff_inter_eq_empty
+```
+
+These normalize products of finite residue-prime subsets into intersection
+and union statements.  They are intended to support the Round75 coprime and
+shared-prime compatible-remainder workers.
+
+Round 76 verification passed:
+
+- `lake env lean Gdbh/PathC_ResiduePrimeSetProductSupport.lean`
 - `lake build`
 - `python3 audit_lean_source.py`
 - `bash scripts/audit_full.sh`
 - `python3 scripts/regenerate_agents_md.py`
 
-The full audit reported 272 Lean files under `Gdbh/`, 234,906 lines, 7,382
+The full audit reported 273 Lean files under `Gdbh/`, 235,122 lines, 7,392
 theorem/lemma declarations, 3,059 definitions, zero genuine `sorry` or
 `admit`, zero axiom declarations, and both headline theorems exactly
 `[propext, Classical.choice, Quot.sound]`.
@@ -102,63 +120,61 @@ with a compatibility copy:
 - `README.md` has a top-level navigation and reproduction section.
 - `.gitignore` excludes local build/dependency caches.
 
-No Lean mathematical change has been made after Round 75.
+`Agent.md` should remain a compatibility copy of `AGENTS.md` after each
+regeneration.
+
+No Lean mathematical change has been made after Round 76.
 
 ## Suggested Next Round
 
-Continue with Round 76.
+Continue with Round 77.
 
 Primary candidate:
 
 ```text
-Candidate: intersection/product support normalization for Round75 remainder
-  Goal: expose gcd-product and compatibility conditions as intersection-of-primes conditions
-  ExpectedDelta: about 40-45
-  Risk: low, algebraic only
+Candidate: non-coprime compatible remainder intersection split
+  Goal: split shared-prime remainder by a nonempty intersection witness and reuse
+        residuePrimeSubset_coprime_iff_inter_eq_empty
+  ExpectedDelta: about 40
+  Risk: low-to-moderate, mostly finite-set algebra
   Execute if Lean proof is small and additive
 ```
 
 Reason:
 
-`PathC_ResidueQuotientMainClosure.lean` already has private lemmas showing
-that, for products of residue-prime subsets,
+Round76 made these product-support facts public:
 
 ```text
-gcd (d1.prod id) (d2.prod id) = (d1 ∩ d2).prod id
-lcm (d1.prod id) (d2.prod id) = (d1 ∪ d2).prod id
+Nat.gcd (d1.prod id) (d2.prod id) = (d1 inter d2).prod id
+Nat.lcm (d1.prod id) (d2.prod id) = (d1 union d2).prod id
+Nat.Coprime (d1.prod id) (d2.prod id) <-> d1 inter d2 = empty
 ```
 
-Those facts are useful for the Round75 coprime/non-coprime compatible
-remainder workers, but they are currently private inside the quotient-main
-closure file. A score-positive additive next step is to create a new file,
-for example:
+The next useful decomposition is to expose the non-coprime compatible
+remainder as a finite union or sum indexed by a nonempty shared prime
+intersection.  Keep it as a named worker Prop first; do not attempt the full
+log-squared analytic bound in the same step.
+
+Possible additive file:
 
 ```text
-Gdbh/PathC_ResiduePrimeSetProductSupport.lean
+Gdbh/PathC_ResidueRemainderIntersectionSplit.lean
 ```
 
 Possible public theorems:
 
 ```text
-residuePrimeSubset_prod_ne_zero
-residuePrimeSubset_squarefree_prod
-residuePrimeSubset_gcd_prod_eq_prod_inter
-residuePrimeSubset_lcm_prod_eq_prod_union
-residuePrimeSubset_gcd_prod_dvd_iff_inter_prod_dvd
-residuePrimeSubset_prod_inter_eq_one_of_coprime
-residuePrimeSubset_coprime_iff_inter_eq_empty
+residueNonCoprimeCompatiblePairCountingRemainder_eq_sharedPrimeSum
+residueNonCoprimeCompatibleRemainderIntersectionSplitUpperEventually
+residueCompatibleRemainderCoprimeSplit_of_intersectionSplit
 ```
-
-Then import it from `Gdbh.lean` and later reuse it in the Round75 remainder
-split.
 
 Secondary candidate:
 
 ```text
-Candidate: non-coprime compatible remainder intersection split
-  Goal: split shared-prime remainder by a nonempty intersection witness / product divisor of n
-  Risk: moderate because it may need more finite-set lemmas
-  Defer until the product-support facts are public
+Candidate: coprime CRT discrepancy worker normalization
+  Goal: isolate the coprime compatible-pair remainder into a CRT-counting Prop
+  Risk: moderate because it touches the bridge to counting input
 ```
 
 Avoid:
@@ -177,7 +193,7 @@ cd /path/to/gdbh
 source "$HOME/.elan/env"
 git status --short --branch
 sed -n '1,140p' AGENTS.md
-sed -n '5247,5380p' pathc_master_scoreboard.md
+tail -n 260 pathc_master_scoreboard.md
 ```
 
-Then start Round 76 with the master-controller workflow above.
+Then start Round 77 with the master-controller workflow above.

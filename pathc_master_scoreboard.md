@@ -5370,3 +5370,138 @@ from a 180 second to a 360 second headline-probe timeout after a false timeout
 despite `audit_full.sh` and a direct manual `#print axioms` check succeeding.
 The regenerated `AGENTS.md` headline table now reports the real allowed axiom
 sets.
+
+## Round 76 - residue prime-set product support
+
+Controller status:
+
+All attempted scout starts were rejected by the tool-layer thread limit:
+
+```text
+round76_product_support_scout
+round76_coprime_intersection_scout
+```
+
+Useful existing agents were not closed merely to free slots.  The controller
+continued directly because the candidate was algebraic, additive, and had a
+clear path to verification.
+
+Score decision:
+
+```text
+Candidate: public residue-prime product support facts
+  FinalChainImpact      4
+  ResidualReduction     4
+  VerificationGain      6
+  DecompositionQuality  6
+  ReuseValue            8
+  FalsePropRisk         0
+  IntegrationRisk       2
+  ScopeDriftRisk        0
+  ExpectedDelta         43
+  Decision              execute
+
+Candidate: direct Round75 log-squared upper closure
+  FinalChainImpact      8
+  ResidualReduction     10
+  VerificationGain      2
+  DecompositionQuality  3
+  ReuseValue            2
+  FalsePropRisk         4
+  IntegrationRisk       8
+  ScopeDriftRisk        0
+  ExpectedDelta         33
+  Decision              defer
+
+Candidate: non-coprime intersection split before product support
+  FinalChainImpact      5
+  ResidualReduction     5
+  VerificationGain      4
+  DecompositionQuality  6
+  ReuseValue            5
+  FalsePropRisk         0
+  IntegrationRisk       5
+  ScopeDriftRisk        0
+  ExpectedDelta         36
+  Decision              defer until product support is public
+
+Candidate: scoreboard-only note
+  FinalChainImpact      1
+  ResidualReduction     0
+  VerificationGain      2
+  DecompositionQuality  4
+  ReuseValue            2
+  FalsePropRisk         0
+  IntegrationRisk       0
+  ScopeDriftRisk        1
+  ExpectedDelta         18
+  Decision              defer
+```
+
+The new file `Gdbh/PathC_ResiduePrimeSetProductSupport.lean`, imported from
+`Gdbh.lean`, exposes public algebraic support lemmas for finite subsets of
+the residue-prime set.  This moves private facts from the quotient-main
+closure area into a reusable additive file for the Round75 coprime and
+non-coprime compatible remainder workers.
+
+Public theorems added:
+
+```text
+residuePrimeSubset_prime
+residuePrimeSubset_prod_ne_zero
+residuePrimeSubset_squarefree_prod
+residuePrimeSubset_prod_dvd_iff_forall_prime_dvd
+residuePrimeSubset_gcd_prod_eq_prod_inter
+residuePrimeSubset_lcm_prod_eq_prod_union
+residuePrimeSubset_gcd_prod_dvd_iff_inter_prod_dvd
+residuePrimeSubset_prod_eq_one_iff_eq_empty
+residuePrimeSubset_prod_inter_eq_one_of_coprime
+residuePrimeSubset_coprime_iff_inter_eq_empty
+```
+
+The key reusable normalizations are:
+
+```text
+Nat.gcd (d1.prod id) (d2.prod id) = (d1 inter d2).prod id
+Nat.lcm (d1.prod id) (d2.prod id) = (d1 union d2).prod id
+Nat.Coprime (d1.prod id) (d2.prod id) <-> d1 inter d2 = empty
+```
+
+This is score-positive because the Round75 split now has public product
+support for translating coprime/shared-prime cases into set-intersection
+statements before any analytic estimate is attempted.  No new cancellation,
+asymptotic, or primorial-sensitive inequality is asserted.
+
+Verification for Round 76 passed:
+
+* `lake env lean Gdbh/PathC_ResiduePrimeSetProductSupport.lean`
+* `lake build`
+* `python3 audit_lean_source.py`
+* `bash scripts/audit_full.sh`
+* `python3 scripts/regenerate_agents_md.py`
+
+The single-file and full-build checks printed allowed axiom sets for the new
+public theorem dependencies.  The source audit scanned 274 Lean files with no
+banned project assumptions or placeholders.  The full audit reported 273 Lean
+files under `Gdbh/`, 235,122 lines, 7,392 theorem/lemma declarations, 3,059
+definitions, zero genuine `sorry` or `admit`, zero axiom declarations, and
+both headline theorems with exactly `[propext, Classical.choice, Quot.sound]`.
+
+The active next worker remains the Round75 split, now with product-support
+facts available for a more precise shared-prime/intersection decomposition:
+
+```text
+ResidueCompatibleRemainderCoprimeSplitLogSquaredUpperEventually
+  = ResidueCoprimeCompatibleRemainderLogSquaredUpperEventually
+    and ResidueNonCoprimeCompatibleRemainderLogSquaredUpperEventually
+```
+
+Next score-positive candidate:
+
+```text
+Candidate: non-coprime compatible remainder intersection split
+  Goal: split shared-prime remainder by a nonempty intersection witness and
+        reuse residuePrimeSubset_coprime_iff_inter_eq_empty
+  ExpectedDelta: about 40
+  Risk: low-to-moderate, mostly finite-set algebra
+```
