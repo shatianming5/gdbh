@@ -22,6 +22,7 @@ Generated from local workspace `/Users/tommy/Downloads/gdbh`.
 7. `Gdbh/PathC_ResiduePrimeSetProductSupport.lean`
 8. `Gdbh/PathC_ResidueRemainderIntersectionSplit.lean`
 9. `Gdbh/PathC_ResidueRemainderSharedPrimeWitness.lean`
+10. `Gdbh/PathC_ResidueRemainderWitnessDivisorPartition.lean`
 
 ## Active Goal
 
@@ -64,7 +65,7 @@ Use targeted `#print axioms` probes for individual theorems. Do not run
 
 ## Current Verified State
 
-Latest verified mathematical round in the scoreboard is Round 78.
+Latest verified mathematical round in the scoreboard is Round 79.
 
 Round 75 added the coprime/non-coprime compatible-remainder split:
 
@@ -172,17 +173,55 @@ residueCompatibleRemainderIntersectionSplitLogSquaredUpperEventually_of_witnessS
 pathC_kGoldbach_of_compatibleRemainderWitnessSplit_and_countingInput
 ```
 
-Round 78 verification passed:
+Round 79 added the divisor-filter witness support:
 
-- `lake env lean Gdbh/PathC_ResidueRemainderSharedPrimeWitness.lean`
+- `Gdbh/PathC_ResidueRemainderWitnessDivisorPartition.lean`
+- import in `Gdbh.lean`
+- active worker:
+
+```text
+ResidueCompatibleRemainderDivisorWitnessSplitLogSquaredUpperEventually
+  = ResidueCoprimeCompatibleRemainderLogSquaredUpperEventually
+    and ResidueSharedPrimeDivisorWitnessRemainderLogSquaredUpperEventually
+  => ResidueCompatibleRemainderWitnessSplitLogSquaredUpperEventually
+  => ResidueCompatibleRemainderIntersectionSplitLogSquaredUpperEventually
+  => ResidueCompatibleRemainderCoprimeSplitLogSquaredUpperEventually
+  => ...
+  => Path C K-Goldbach
+```
+
+The finite support is:
+
+```text
+residuePrimeDivisorWitnessSet n z =
+  (residuePrimeSet z).filter (fun p => p divides n)
+```
+
+Key bridges:
+
+```text
+residueSharedPrimeWitnessCondition_iff_primeDivisorWitness
+residueSharedPrimeWitnessPairCountingRemainder_eq_divisorWitness
+residueDoubleDivisorSharedPrimeWitnessRemainderSum_eq_divisorWitness
+residueSharedPrimeWitnessRemainderLogSquaredUpperEventually_of_divisorWitness
+residueCompatibleRemainderWitnessSplitLogSquaredUpperEventually_of_divisorWitnessSplit
+pathC_kGoldbach_of_compatibleRemainderDivisorWitnessSplit_and_countingInput
+```
+
+This is a support/filter normalization, not a disjoint sum over witnesses.
+A divisor pair can have multiple shared prime witnesses.
+
+Round 79 verification passed:
+
+- `lake env lean Gdbh/PathC_ResidueRemainderWitnessDivisorPartition.lean`
 - `lake build`
 - `python3 audit_lean_source.py`
 - `bash scripts/audit_full.sh`
 - `python3 scripts/regenerate_agents_md.py`
 
-The source audit scanned 276 Lean files with no banned project assumptions or
-placeholders.  The full audit reported 275 Lean files under `Gdbh/`, 235,635
-lines, 7,411 theorem/lemma declarations, 3,071 definitions, zero genuine `sorry` or
+The source audit scanned 277 Lean files with no banned project assumptions or
+placeholders.  The full audit reported 276 Lean files under `Gdbh/`, 235,879
+lines, 7,421 theorem/lemma declarations, 3,078 definitions, zero genuine `sorry` or
 `admit`, zero axiom declarations, and both headline theorems exactly
 `[propext, Classical.choice, Quot.sound]`.
 
@@ -199,50 +238,49 @@ with a compatibility copy:
 `Agent.md` should remain a compatibility copy of `AGENTS.md` after each
 regeneration.
 
-No Lean mathematical change has been made after Round 78.
+No Lean mathematical change has been made after Round 79.
 
 ## Suggested Next Round
 
-Continue with Round 79.
+Continue with Round 80.
 
 Primary candidate:
 
 ```text
-Candidate: witness-supported shared-prime divisor partition
-  Goal: split the witness branch by primes p dividing n, probably as a finite
-        support/filter normalization rather than a disjoint sum identity
+Candidate: divisor-witness cover inequality
+  Goal: bound the witness-supported branch by a finite cover over
+        residuePrimeDivisorWitnessSet n z, explicitly allowing overlaps
   ExpectedDelta: about 36-40
-  Risk: moderate, because multiple shared primes can witness the same pair
+  Risk: moderate, because it needs absolute values and finite-cover bookkeeping
   Execute if Lean proof is small and additive
 ```
 
 Reason:
 
-Round78 made the witness support explicit:
+Round79 made the finite divisor witness support explicit:
 
 ```text
-if exists p, p in d1 inter d2 and p divides n then
-  residueSharedPrimeIntersectionPairCountingRemainder ...
-else 0
+residuePrimeDivisorWitnessSet n z =
+  (residuePrimeSet z).filter (fun p => p divides n)
 ```
 
-The next useful decomposition is to normalize this support against the finite
-set of primes dividing `n`.  Avoid claiming a disjoint sum over witnesses,
-because a pair can have multiple shared primes.  A support/filter equality or
-finite cover bound is safer than a naive sum identity.
+The next useful decomposition is a finite cover/upper-bound statement over
+this set.  Avoid claiming a disjoint sum over witnesses, because a pair can
+have multiple shared primes.  The safe shape is an absolute-value cover bound
+or a support inclusion that explicitly allows overlap.
 
 Possible additive file:
 
 ```text
-Gdbh/PathC_ResidueRemainderWitnessDivisorPartition.lean
+Gdbh/PathC_ResidueRemainderWitnessCover.lean
 ```
 
 Possible public theorems:
 
 ```text
-residueSharedPrimeWitnessPairCountingRemainder_eq_zero_of_no_primeDivisorWitness
-residueSharedPrimeWitnessSupport_subset_primeDivisors
-ResidueSharedPrimeDivisorPartitionRemainderLogSquaredUpperEventually
+residueSharedPrimeDivisorWitnessPair_abs_le_coverSum
+residueDoubleDivisorSharedPrimeDivisorWitness_abs_le_coverSum
+ResidueSharedPrimeWitnessCoverLogSquaredUpperEventually
 ```
 
 Secondary candidate:
@@ -272,4 +310,4 @@ sed -n '1,140p' AGENTS.md
 tail -n 260 pathc_master_scoreboard.md
 ```
 
-Then start Round 79 with the master-controller workflow above.
+Then start Round 80 with the master-controller workflow above.

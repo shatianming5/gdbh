@@ -5808,3 +5808,143 @@ Candidate: witness-supported shared-prime divisor partition
   ExpectedDelta: about 36-40
   Risk: moderate, because multiple shared primes can witness the same pair
 ```
+
+## Round 79 - divisor-filter witness support
+
+Controller status:
+
+The controller kept the same no-new-subagent posture because the tool-layer
+thread limit had already rejected scouts in the prior rounds, while this task
+was a narrow algebraic support normalization.  No useful running agent was
+closed, and no headline file was edited.
+
+Score decision:
+
+```text
+Candidate: finite residue-prime divisor witness support
+  FinalChainImpact      5
+  ResidualReduction     5
+  VerificationGain      5
+  DecompositionQuality  7
+  ReuseValue            6
+  FalsePropRisk         0
+  IntegrationRisk       3
+  ScopeDriftRisk        0
+  ExpectedDelta         39
+  Decision              execute
+
+Candidate: naive disjoint sum over witness primes
+  FinalChainImpact      6
+  ResidualReduction     6
+  VerificationGain      1
+  DecompositionQuality  2
+  ReuseValue            2
+  FalsePropRisk         5
+  IntegrationRisk       9
+  ScopeDriftRisk        0
+  ExpectedDelta         11
+  Decision              reject: a pair can have multiple shared witnesses
+
+Candidate: direct divisor-filter analytic upper closure
+  FinalChainImpact      8
+  ResidualReduction     10
+  VerificationGain      2
+  DecompositionQuality  3
+  ReuseValue            2
+  FalsePropRisk         4
+  IntegrationRisk       8
+  ScopeDriftRisk        0
+  ExpectedDelta         33
+  Decision              defer
+
+Candidate: scoreboard-only note
+  FinalChainImpact      1
+  ResidualReduction     0
+  VerificationGain      2
+  DecompositionQuality  4
+  ReuseValue            2
+  FalsePropRisk         0
+  IntegrationRisk       0
+  ScopeDriftRisk        1
+  ExpectedDelta         18
+  Decision              defer
+```
+
+The new file `Gdbh/PathC_ResidueRemainderWitnessDivisorPartition.lean`,
+imported from `Gdbh.lean`, normalizes the Round78 witness support against the
+finite set of residue primes dividing `n`:
+
+```text
+residuePrimeDivisorWitnessSet n z =
+  (residuePrimeSet z).filter (fun p => p divides n)
+```
+
+Public definitions and worker Props added:
+
+```text
+residuePrimeDivisorWitnessSet
+residueSharedPrimeDivisorWitnessPairCountingRemainder
+residueDoubleDivisorSharedPrimeDivisorWitnessRemainderSum
+residueDoubleDivisorSharedPrimeDivisorWitnessRemainderSumAtSqrt
+ResidueSharedPrimeDivisorWitnessRemainderLogSquaredUpperAfter
+ResidueSharedPrimeDivisorWitnessRemainderLogSquaredUpperEventually
+ResidueCompatibleRemainderDivisorWitnessSplitLogSquaredUpperEventually
+```
+
+Public bridges added:
+
+```text
+residuePrimeDivisorWitnessSet_subset
+mem_residuePrimeDivisorWitnessSet_iff
+residueSharedPrimeWitnessCondition_iff_primeDivisorWitness
+residueSharedPrimeWitnessPairCountingRemainder_eq_divisorWitness
+residueDoubleDivisorSharedPrimeWitnessRemainderSum_eq_divisorWitness
+residueDoubleDivisorSharedPrimeWitnessRemainderSumAtSqrt_eq_divisorWitness
+residueSharedPrimeWitnessRemainderLogSquaredUpperAfter_of_divisorWitness
+residueSharedPrimeWitnessRemainderLogSquaredUpperEventually_of_divisorWitness
+residueCompatibleRemainderWitnessSplitLogSquaredUpperEventually_of_divisorWitnessSplit
+pathC_kGoldbach_of_compatibleRemainderDivisorWitnessSplit_and_countingInput
+```
+
+The new active decomposition is:
+
+```text
+ResidueCompatibleRemainderDivisorWitnessSplitLogSquaredUpperEventually
+  = ResidueCoprimeCompatibleRemainderLogSquaredUpperEventually
+    and ResidueSharedPrimeDivisorWitnessRemainderLogSquaredUpperEventually
+  => ResidueCompatibleRemainderWitnessSplitLogSquaredUpperEventually
+  => ResidueCompatibleRemainderIntersectionSplitLogSquaredUpperEventually
+  => ResidueCompatibleRemainderCoprimeSplitLogSquaredUpperEventually
+  => ...
+  => Path C K-Goldbach
+```
+
+This is score-positive because it creates a finite, `z`-bounded divisor
+witness support without making the false stronger claim that witnesses are
+disjoint.  The next step can use this support set for cover/cardinality or
+partition-style estimates with explicit overlap handling.
+
+Verification for Round 79 passed:
+
+* `lake env lean Gdbh/PathC_ResidueRemainderWitnessDivisorPartition.lean`
+* `lake build`
+* `python3 audit_lean_source.py`
+* `bash scripts/audit_full.sh`
+* `python3 scripts/regenerate_agents_md.py`
+
+The single-file and full-build checks printed allowed axiom sets for the new
+public theorem dependencies.  The source audit scanned 277 Lean files with no
+banned project assumptions or placeholders.  The full audit reported 276 Lean
+files under `Gdbh/`, 235,879 lines, 7,421 theorem/lemma declarations, 3,078
+definitions, zero genuine `sorry` or `admit`, zero axiom declarations, and
+both headline theorems with exactly `[propext, Classical.choice, Quot.sound]`.
+
+Next score-positive candidate:
+
+```text
+Candidate: divisor-witness cover inequality
+  Goal: bound the witness-supported branch by a finite cover over
+        residuePrimeDivisorWitnessSet n z, explicitly allowing overlaps
+  ExpectedDelta: about 36-40
+  Risk: moderate, because it needs absolute values and finite-cover bookkeeping
+```
